@@ -1,0 +1,1359 @@
+import Foundation
+
+enum CrisisRiskLevel: Int, Comparable {
+    case low = 1
+    case medium = 2
+    case high = 3
+
+    static func < (lhs: CrisisRiskLevel, rhs: CrisisRiskLevel) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+
+    var shouldTriggerIntervention: Bool {
+        self >= .medium
+    }
+}
+
+struct CrisisDetectionResult {
+    let riskLevel: CrisisRiskLevel
+    let phrase: String
+    let language: String
+    let category: String
+}
+
+enum CrisisLexicon {
+    static func detectRisk(in text: String) -> CrisisDetectionResult? {
+        let corpus = loadCorpus()
+        let normalizedText = normalize(text)
+
+        for match in findMatches(in: text, normalizedText: normalizedText, groups: corpus.high, riskLevel: .high) {
+            return match
+        }
+
+        if containsNegationContext(in: text, normalizedText: normalizedText, corpus: corpus) {
+            return nil
+        }
+
+        for match in findMatches(in: text, normalizedText: normalizedText, groups: corpus.medium, riskLevel: .medium) {
+            return match
+        }
+
+        for match in findMatches(in: text, normalizedText: normalizedText, groups: corpus.low, riskLevel: .low) {
+            return match
+        }
+
+        return nil
+    }
+
+    static func containsCrisisTerms(in text: String) -> Bool {
+        detectRisk(in: text)?.riskLevel.shouldTriggerIntervention == true
+    }
+
+    private static func containsNegationContext(in text: String, normalizedText: String, corpus: CrisisCorpus) -> Bool {
+        corpus.negationContexts.contains(where: { entry in
+            let (language, phrases) = entry
+            return phrases.contains(where: { phrase in
+                phraseMatches(phrase, language: language, text: text, normalizedText: normalizedText)
+            })
+        })
+    }
+
+    private static func findMatches(
+        in text: String,
+        normalizedText: String,
+        groups: [String: [String: [String]]],
+        riskLevel: CrisisRiskLevel
+    ) -> [CrisisDetectionResult] {
+        var results: [CrisisDetectionResult] = []
+
+        for (language, categories) in groups {
+            for (category, phrases) in categories {
+                for phrase in phrases where phraseMatches(phrase, language: language, text: text, normalizedText: normalizedText) {
+                    results.append(
+                        CrisisDetectionResult(
+                            riskLevel: riskLevel,
+                            phrase: phrase,
+                            language: language,
+                            category: category
+                        )
+                    )
+                }
+            }
+        }
+
+        return results
+    }
+
+    private static func phraseMatches(_ phrase: String, language: String, text: String, normalizedText: String) -> Bool {
+        if language == "en" {
+            return englishPhraseMatches(phrase, in: text)
+        }
+
+        return normalizedText.contains(normalize(phrase))
+    }
+
+    private static func englishPhraseMatches(_ phrase: String, in text: String) -> Bool {
+        let lowercasedText = text.lowercased()
+        let escaped = NSRegularExpression.escapedPattern(for: phrase.lowercased())
+        let whitespaceFlexible = escaped.replacingOccurrences(of: "\\ ", with: "\\s+")
+        let pattern = "\\b\(whitespaceFlexible)\\b"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            return lowercasedText.contains(phrase.lowercased())
+        }
+
+        let range = NSRange(lowercasedText.startIndex..., in: lowercasedText)
+        return regex.firstMatch(in: lowercasedText, options: [], range: range) != nil
+    }
+
+    private static func normalize(_ text: String) -> String {
+        let lowered = text.lowercased()
+        return lowered.unicodeScalars.filter { scalar in
+            CharacterSet.alphanumerics.contains(scalar) ||
+            CharacterSet(charactersIn: "\u{4E00}"..."\u{9FFF}").contains(scalar)
+        }
+        .map(String.init)
+        .joined()
+    }
+
+    private static func loadCorpus() -> CrisisCorpus {
+        if let cached = cachedCorpus {
+            return cached
+        }
+
+        guard let data = corpusJSONString.data(using: .utf8),
+              let decoded = try? JSONDecoder().decode(CrisisCorpus.self, from: data) else {
+            let fallback = CrisisCorpus(high: [:], medium: [:], low: [:], negationContexts: [:])
+            cachedCorpus = fallback
+            return fallback
+        }
+
+        cachedCorpus = decoded
+        return decoded
+    }
+
+    private static var cachedCorpus: CrisisCorpus?
+
+    private struct CrisisCorpus: Decodable {
+        let high: [String: [String: [String]]]
+        let medium: [String: [String: [String]]]
+        let low: [String: [String: [String]]]
+        let negationContexts: [String: [String]]
+
+        enum CodingKeys: String, CodingKey {
+            case high = "HIGH"
+            case medium = "MEDIUM"
+            case low = "LOW"
+            case negationContexts = "NEGATION_CONTEXTS"
+        }
+    }
+
+    private static let corpusJSONString = #"""
+{
+  "HIGH": {
+    "zh-TW": {
+      "suicide_intent_explicit": [
+        "我想自殺",
+        "我要自殺",
+        "我準備自殺",
+        "我打算自殺",
+        "我決定自殺",
+        "真的想自殺",
+        "真的要自殺",
+        "真想自殺",
+        "我想結束生命",
+        "我要結束生命",
+        "我想結束我的人生",
+        "我想結束這一切",
+        "我不想活了",
+        "我不想活下去了",
+        "我活不下去了",
+        "我活不下去",
+        "真的活不下去",
+        "真的不想活",
+        "真的不想活了",
+        "我想死",
+        "我要死了",
+        "我想去死",
+        "讓我去死",
+        "我該死",
+        "好想死",
+        "真的好想死",
+        "真的想死",
+        "我想殺了自己",
+        "我要殺死自己",
+        "我想了結自己",
+        "我要了結自己",
+        "我想消失在這個世界",
+        "我想永遠消失",
+        "想從這個世界消失",
+        "活著沒意義我要走了",
+        "我想離開這個世界",
+        "我要離開這個世界",
+        "我想跟這個世界說再見",
+        "再也不想醒來",
+        "希望明天不要醒來",
+        "我活夠了",
+        "活到今天就好",
+        "今天是我最後一天"
+      ],
+      "suicide_plan": [
+        "我已經計畫好了",
+        "我已經想好怎麼死",
+        "我都計畫好了",
+        "我已經寫好遺書",
+        "我寫好遺書了",
+        "我留好遺書了",
+        "我的遺書",
+        "我選好日子了",
+        "我決定好哪一天",
+        "就在今晚",
+        "就是今天",
+        "我已經準備好了",
+        "我都準備好了",
+        "我把東西都處理好了",
+        "我交代好後事",
+        "我把事情都安排好了",
+        "我已經跟大家道別",
+        "我已經說再見了",
+        "我知道要怎麼結束",
+        "我已經想好方法"
+      ],
+      "suicide_method": [
+        "我買了繩子",
+        "我準備了繩子",
+        "我有繩子",
+        "我囤了藥",
+        "我存了藥",
+        "我準備好藥",
+        "我把藥都收集好",
+        "我吞了藥",
+        "我吃了藥要自殺",
+        "我吃了一整罐藥",
+        "我準備燒炭",
+        "我要燒炭",
+        "我已經買好木炭",
+        "我準備跳樓",
+        "我要跳下去",
+        "我站在頂樓",
+        "我在頂樓邊緣",
+        "我要跳河",
+        "我要跳海",
+        "我要跳橋",
+        "我準備割腕",
+        "我要割腕了",
+        "我拿著刀",
+        "我要上吊",
+        "我準備上吊",
+        "我有一把刀",
+        "我手上有刀",
+        "我握著刀",
+        "我打開瓦斯",
+        "我把瓦斯打開"
+      ],
+      "suicide_in_progress": [
+        "我正在割",
+        "我正在流血",
+        "我已經割了",
+        "我剛剛割了",
+        "我已經吞下去了",
+        "我已經吃下去了",
+        "我跳下去了",
+        "我已經在頂樓",
+        "血流不止",
+        "我血流不止",
+        "我快不行了",
+        "我快死了",
+        "我撐不住了",
+        "救救我"
+      ],
+      "farewell": [
+        "謝謝大家照顧",
+        "謝謝你們一直以來的照顧",
+        "請好好照顧自己",
+        "你要好好照顧自己",
+        "對不起讓你失望",
+        "對不起我撐不下去",
+        "別找我了",
+        "不要找我",
+        "不要救我",
+        "我先走了",
+        "我要走了再見",
+        "把我的東西",
+        "我的密碼是",
+        "我的存款給",
+        "下輩子再見",
+        "來生再見",
+        "希望有來生"
+      ]
+    },
+    "zh-CN": {
+      "suicide_intent_explicit": [
+        "我想自杀",
+        "我要自杀",
+        "我准备自杀",
+        "我打算自杀",
+        "我决定自杀",
+        "真的想自杀",
+        "真的要自杀",
+        "真想自杀",
+        "我想结束生命",
+        "我要结束生命",
+        "我想结束我的人生",
+        "我想结束这一切",
+        "我不想活了",
+        "我不想活下去了",
+        "我活不下去了",
+        "我活不下去",
+        "真的活不下去",
+        "真的不想活",
+        "真的不想活了",
+        "我想死",
+        "我要死了",
+        "我想去死",
+        "让我去死",
+        "我该死",
+        "好想死",
+        "真的好想死",
+        "真的想死",
+        "我想杀了自己",
+        "我要杀死自己",
+        "我想了结自己",
+        "我要了结自己",
+        "我想消失在这个世界",
+        "我想永远消失",
+        "想从这个世界消失",
+        "活着没意义我要走了",
+        "我想离开这个世界",
+        "我要离开这个世界",
+        "我想跟这个世界说再见",
+        "再也不想醒来",
+        "希望明天不要醒来",
+        "我活够了",
+        "活到今天就好",
+        "今天是我最后一天",
+        "想轻生",
+        "我要轻生",
+        "走上绝路"
+      ],
+      "suicide_plan": [
+        "我已经计划好了",
+        "我已经想好怎么死",
+        "我都计划好了",
+        "我已经写好遗书",
+        "我写好遗书了",
+        "我留好遗书了",
+        "我的遗书",
+        "我选好日子了",
+        "我决定好哪一天",
+        "就在今晚",
+        "就是今天",
+        "我已经准备好了",
+        "我都准备好了",
+        "我把东西都处理好了",
+        "我交代好后事",
+        "我把事情都安排好了",
+        "我已经跟大家道别",
+        "我已经说再见了",
+        "我知道要怎么结束",
+        "我已经想好方法"
+      ],
+      "suicide_method": [
+        "我买了绳子",
+        "我准备了绳子",
+        "我有绳子",
+        "我囤了药",
+        "我存了药",
+        "我准备好药",
+        "我把药都收集好",
+        "我吞了药",
+        "我吃了药要自杀",
+        "我吃了一整瓶药",
+        "我吃了一整罐药",
+        "我准备烧炭",
+        "我要烧炭",
+        "我已经买好木炭",
+        "我准备跳楼",
+        "我要跳下去",
+        "我站在楼顶",
+        "我在楼顶边缘",
+        "我要跳河",
+        "我要跳海",
+        "我要跳桥",
+        "我准备割腕",
+        "我要割腕了",
+        "我拿着刀",
+        "我要上吊",
+        "我准备上吊",
+        "我有一把刀",
+        "我手上有刀",
+        "我握着刀",
+        "我打开煤气",
+        "我把煤气打开",
+        "我开了煤气",
+        "喝农药",
+        "我喝了农药"
+      ],
+      "suicide_in_progress": [
+        "我正在割",
+        "我正在流血",
+        "我已经割了",
+        "我刚刚割了",
+        "我已经吞下去了",
+        "我已经吃下去了",
+        "我跳下去了",
+        "我已经在楼顶",
+        "血流不止",
+        "我血流不止",
+        "我快不行了",
+        "我快死了",
+        "我撑不住了",
+        "救救我"
+      ],
+      "farewell": [
+        "谢谢大家照顾",
+        "谢谢你们一直以来的照顾",
+        "请好好照顾自己",
+        "你要好好照顾自己",
+        "对不起让你失望",
+        "对不起我撑不下去",
+        "别找我了",
+        "不要找我",
+        "不要救我",
+        "我先走了",
+        "我要走了再见",
+        "把我的东西",
+        "我的密码是",
+        "我的存款给",
+        "下辈子再见",
+        "来生再见",
+        "希望有来生"
+      ]
+    },
+    "en": {
+      "suicide_intent_explicit": [
+        "i want to kill myself",
+        "i want to die",
+        "i wanna die",
+        "i'm going to kill myself",
+        "i am going to kill myself",
+        "i'm gonna kill myself",
+        "gonna end it",
+        "i want to end my life",
+        "i'm going to end my life",
+        "i want to end it all",
+        "i want to end it",
+        "i'm ending it tonight",
+        "ending it all",
+        "i'd be better off dead",
+        "i would be better off dead",
+        "everyone would be better off without me",
+        "i can't go on",
+        "i can't keep going",
+        "i don't want to be alive",
+        "i don't want to live anymore",
+        "i don't want to live",
+        "i wish i was dead",
+        "i wish i were dead",
+        "i wish i could die",
+        "i wish i would die",
+        "i'm going to commit suicide",
+        "going to commit suicide",
+        "i want to commit suicide",
+        "today is my last day",
+        "tonight is my last night",
+        "i won't be here tomorrow",
+        "i won't see tomorrow",
+        "i hope i don't wake up",
+        "i wish i wouldn't wake up",
+        "i'm done with life",
+        "done with living",
+        "i want to disappear forever",
+        "i want to vanish forever",
+        "ready to die",
+        "i'm ready to die"
+      ],
+      "suicide_plan": [
+        "i have a plan",
+        "i've got a plan",
+        "i made a plan",
+        "i've written my note",
+        "i wrote my suicide note",
+        "my suicide note",
+        "i've picked the date",
+        "i chose the day",
+        "i picked a day",
+        "i'm doing it tonight",
+        "i'm doing it tomorrow",
+        "everything is ready",
+        "i'm all set",
+        "i've given away my things",
+        "giving away my belongings",
+        "i've said my goodbyes",
+        "i've already said goodbye",
+        "i know how to do it",
+        "i figured out how"
+      ],
+      "suicide_method": [
+        "i bought a rope",
+        "i have a rope",
+        "got a rope",
+        "i stockpiled pills",
+        "i've been saving pills",
+        "i collected pills",
+        "i took the pills",
+        "i swallowed the pills",
+        "i took all the pills",
+        "i'm going to overdose",
+        "going to overdose tonight",
+        "i'm going to jump",
+        "i'll jump off",
+        "standing on the roof",
+        "on the ledge",
+        "i'm going to hang myself",
+        "going to hang myself",
+        "i have a gun",
+        "got a gun",
+        "loaded the gun",
+        "i'm going to shoot myself",
+        "going to shoot myself",
+        "i'm going to slit my wrists",
+        "going to cut my wrists",
+        "i have a knife in my hand",
+        "holding a knife",
+        "carbon monoxide",
+        "going to gas myself"
+      ],
+      "suicide_in_progress": [
+        "i'm cutting now",
+        "i'm bleeding",
+        "i just cut myself deep",
+        "i already took them",
+        "i swallowed them all",
+        "i took them all",
+        "i'm on the roof",
+        "i jumped",
+        "i'm about to jump",
+        "i can't stop the bleeding",
+        "won't stop bleeding",
+        "i'm dying",
+        "i think i'm dying",
+        "help me",
+        "save me",
+        "please help me"
+      ],
+      "farewell": [
+        "thank you for everything",
+        "thanks for being there",
+        "please take care of yourself",
+        "take care of yourself",
+        "i'm sorry i let you down",
+        "sorry i couldn't be stronger",
+        "don't look for me",
+        "don't try to find me",
+        "don't save me",
+        "goodbye forever",
+        "this is goodbye",
+        "final goodbye",
+        "take care of my",
+        "please take care of my",
+        "see you in the next life",
+        "see you on the other side",
+        "i love you all goodbye"
+      ]
+    }
+  },
+  "MEDIUM": {
+    "zh-TW": {
+      "suicide_ideation": [
+        "有時候會想死",
+        "有時候想死",
+        "偶爾想死",
+        "常常想死",
+        "想到自殺",
+        "腦中會出現自殺",
+        "一直想到死",
+        "如果我死了",
+        "如果我消失",
+        "我消失了會怎樣",
+        "活著好痛苦",
+        "活著好累",
+        "活得好累",
+        "我好累不想活",
+        "活著沒意義",
+        "人生沒意義",
+        "活著有什麼意義",
+        "為什麼要活著",
+        "為什麼還要活著",
+        "幹嘛要活著",
+        "想消失",
+        "好想消失",
+        "我想消失一陣子",
+        "想睡著不要醒來",
+        "希望睡著就不要醒來",
+        "如果我不在",
+        "如果世界上沒有我",
+        "死了會比較輕鬆",
+        "死了就解脫了",
+        "死掉應該就不痛了",
+        "希望出意外",
+        "出車禍就好了",
+        "希望被車撞"
+      ],
+      "self_harm": [
+        "我割了自己",
+        "我割腕",
+        "我割手",
+        "我又割了",
+        "我用刀劃自己",
+        "我拿刀劃",
+        "我劃了自己",
+        "我傷害自己",
+        "我打自己",
+        "我捶自己",
+        "我撞牆",
+        "我燙傷自己",
+        "我用菸燙",
+        "我用菸燙自己",
+        "我咬自己",
+        "我抓傷自己",
+        "我把自己抓花",
+        "看到血才比較好",
+        "流血讓我冷靜",
+        "流血才有真實感",
+        "用痛來分散",
+        "用痛感讓自己",
+        "我自殘",
+        "我又自殘了",
+        "想自殘",
+        "想自傷"
+      ],
+      "hopelessness_strong": [
+        "完全沒有希望",
+        "一點希望都沒有",
+        "看不到任何希望",
+        "看不到未來",
+        "未來一片黑暗",
+        "前面只有黑暗",
+        "永遠不會好起來",
+        "再也不會好起來",
+        "不可能變好",
+        "什麼都沒救了",
+        "已經沒救了",
+        "我已經沒救了",
+        "走不出來",
+        "永遠走不出來",
+        "怎樣都走不出來",
+        "沒有出路",
+        "沒有出口",
+        "找不到出口",
+        "撐不下去了",
+        "我撐不下去",
+        "再也撐不下去"
+      ],
+      "burden": [
+        "我是大家的累贅",
+        "我只是個累贅",
+        "我變成累贅",
+        "沒有我大家會更好",
+        "我消失大家會更好",
+        "我只會拖累別人",
+        "我拖累大家",
+        "我拖累家人",
+        "我是負擔",
+        "我是個負擔",
+        "我成了負擔",
+        "我活著只會傷害別人",
+        "我活著只會帶來麻煩",
+        "我不該被生下來",
+        "為什麼要把我生下來"
+      ],
+      "worthlessness_severe": [
+        "我一無是處",
+        "我什麼都不是",
+        "我是垃圾",
+        "我就是個垃圾",
+        "我是廢物",
+        "我就是廢物",
+        "我活著像廢物",
+        "我不配活著",
+        "我不配活在這個世界",
+        "沒人會在乎我死活",
+        "沒有人在乎我",
+        "誰都不在乎我",
+        "我活著也沒人會想念",
+        "沒有人會想念我"
+      ]
+    },
+    "zh-CN": {
+      "suicide_ideation": [
+        "有时候会想死",
+        "有时候想死",
+        "偶尔想死",
+        "常常想死",
+        "想到自杀",
+        "脑中会出现自杀",
+        "一直想到死",
+        "如果我死了",
+        "如果我消失",
+        "我消失了会怎样",
+        "活着好痛苦",
+        "活着好累",
+        "活得好累",
+        "我好累不想活",
+        "活着没意义",
+        "人生没意义",
+        "活着有什么意义",
+        "为什么要活着",
+        "为什么还要活着",
+        "干嘛要活着",
+        "想消失",
+        "好想消失",
+        "我想消失一阵子",
+        "想睡着不要醒来",
+        "希望睡着就不要醒来",
+        "如果我不在",
+        "如果世界上没有我",
+        "死了会比较轻松",
+        "死了就解脱了",
+        "死掉应该就不痛了",
+        "希望出意外",
+        "出车祸就好了",
+        "希望被车撞",
+        "想轻生",
+        "有轻生念头"
+      ],
+      "self_harm": [
+        "我割了自己",
+        "我割腕",
+        "我割手",
+        "我又割了",
+        "我用刀划自己",
+        "我拿刀划",
+        "我划了自己",
+        "我伤害自己",
+        "我打自己",
+        "我捶自己",
+        "我撞墙",
+        "我烫伤自己",
+        "我用烟烫",
+        "我用烟烫自己",
+        "我咬自己",
+        "我抓伤自己",
+        "我把自己抓花",
+        "看到血才比较好",
+        "流血让我冷静",
+        "流血才有真实感",
+        "用痛来分散",
+        "用痛感让自己",
+        "我自残",
+        "我又自残了",
+        "想自残",
+        "想自伤"
+      ],
+      "hopelessness_strong": [
+        "完全没有希望",
+        "一点希望都没有",
+        "看不到任何希望",
+        "看不到未来",
+        "未来一片黑暗",
+        "前面只有黑暗",
+        "永远不会好起来",
+        "再也不会好起来",
+        "不可能变好",
+        "什么都没救了",
+        "已经没救了",
+        "我已经没救了",
+        "走不出来",
+        "永远走不出来",
+        "怎样都走不出来",
+        "没有出路",
+        "没有出口",
+        "找不到出口",
+        "撑不下去了",
+        "我撑不下去",
+        "再也撑不下去"
+      ],
+      "burden": [
+        "我是大家的累赘",
+        "我只是个累赘",
+        "我变成累赘",
+        "没有我大家会更好",
+        "我消失大家会更好",
+        "我只会拖累别人",
+        "我拖累大家",
+        "我拖累家人",
+        "我是负担",
+        "我是个负担",
+        "我成了负担",
+        "我活着只会伤害别人",
+        "我活着只会带来麻烦",
+        "我不该被生下来",
+        "为什么要把我生下来"
+      ],
+      "worthlessness_severe": [
+        "我一无是处",
+        "我什么都不是",
+        "我是垃圾",
+        "我就是个垃圾",
+        "我是废物",
+        "我就是废物",
+        "我活着像废物",
+        "我不配活着",
+        "我不配活在这个世界",
+        "没人会在乎我死活",
+        "没有人在乎我",
+        "谁都不在乎我",
+        "我活着也没人会想念",
+        "没有人会想念我"
+      ]
+    },
+    "en": {
+      "suicide_ideation": [
+        "sometimes i want to die",
+        "sometimes i think about dying",
+        "i think about killing myself",
+        "i sometimes think about killing myself",
+        "i often think about killing myself",
+        "i keep thinking about killing myself",
+        "thinking about killing myself",
+        "thoughts of killing myself",
+        "thoughts of suicide",
+        "suicidal thoughts",
+        "i'm having suicidal thoughts",
+        "i feel suicidal",
+        "i'm feeling suicidal",
+        "thinking about ending it",
+        "thoughts of ending my life",
+        "what if i died",
+        "what if i wasn't here",
+        "if i was gone",
+        "if i disappeared",
+        "if i didn't exist",
+        "life is too painful",
+        "living is too painful",
+        "it hurts to be alive",
+        "i'm too tired to live",
+        "too exhausted to keep going",
+        "what's the point of living",
+        "what's the point of being alive",
+        "no point in living",
+        "there's no point in living",
+        "i want to disappear",
+        "i just want to disappear",
+        "i wish i could just sleep forever",
+        "wish i could sleep and not wake up",
+        "death would be a relief",
+        "dying would be peaceful",
+        "wish something would happen to me",
+        "hope i get hit by a car",
+        "wish i could just not exist",
+        "wish i wasn't born"
+      ],
+      "self_harm": [
+        "i cut myself",
+        "i've been cutting",
+        "i cut myself again",
+        "i'm cutting again",
+        "i started cutting again",
+        "i hurt myself",
+        "i hit myself",
+        "i punch myself",
+        "i bang my head",
+        "banging my head against the wall",
+        "i burn myself",
+        "i burned myself with",
+        "i scratch myself until",
+        "scratching until i bleed",
+        "seeing blood helps",
+        "the blood calms me",
+        "the pain helps",
+        "physical pain helps with",
+        "i self harm",
+        "i self-harm",
+        "i've been self-harming",
+        "want to hurt myself",
+        "i want to self-harm"
+      ],
+      "hopelessness_strong": [
+        "there's no hope",
+        "no hope left",
+        "i have no hope",
+        "i can't see a future",
+        "no future for me",
+        "future is dark",
+        "it will never get better",
+        "things will never get better",
+        "nothing will ever change",
+        "i'll never get better",
+        "i'm beyond saving",
+        "no one can save me",
+        "i'm beyond help",
+        "i can't get out of this",
+        "i'll never escape this",
+        "no way out",
+        "there's no way out",
+        "no escape",
+        "i can't keep going",
+        "can't go on like this",
+        "can't take it anymore"
+      ],
+      "burden": [
+        "i'm a burden",
+        "i'm such a burden",
+        "i'm just a burden",
+        "everyone would be better without me",
+        "they'd be better off without me",
+        "i'm dragging everyone down",
+        "i drag everyone down",
+        "i ruin everything",
+        "i ruin everyone's life",
+        "i shouldn't have been born",
+        "i wish i was never born",
+        "my family would be better off"
+      ],
+      "worthlessness_severe": [
+        "i'm worthless",
+        "i am completely worthless",
+        "i'm nothing",
+        "i'm a piece of garbage",
+        "i'm trash",
+        "i don't deserve to live",
+        "i don't deserve to be alive",
+        "no one cares if i live or die",
+        "nobody cares about me",
+        "no one would miss me",
+        "nobody would notice if i was gone"
+      ]
+    }
+  },
+  "LOW": {
+    "zh-TW": {
+      "emotional_distress": [
+        "我好難過",
+        "我真的很難過",
+        "我超難過",
+        "我好痛苦",
+        "我真的很痛苦",
+        "好痛苦",
+        "我好累",
+        "我真的好累",
+        "心好累",
+        "好疲憊",
+        "我快崩潰了",
+        "我要崩潰了",
+        "我崩潰了",
+        "我撐不住",
+        "我快撐不住了",
+        "好難撐",
+        "我很憂鬱",
+        "我很沮喪",
+        "我很絕望",
+        "我心情很差",
+        "心情糟透了",
+        "心情爛透了",
+        "我覺得很糟",
+        "我覺得很爛",
+        "我覺得很無力",
+        "壓力好大",
+        "壓力快爆炸",
+        "我快要爆炸了",
+        "我哭了一整晚",
+        "我每天都在哭",
+        "我止不住地哭"
+      ],
+      "hopelessness_mild": [
+        "我看不到希望",
+        "好像沒有希望",
+        "感覺沒希望",
+        "我不知道該怎麼辦",
+        "我真的不知道該怎麼辦",
+        "感覺很無助",
+        "我好無助",
+        "我真的好無助",
+        "我覺得卡住了",
+        "我卡住了",
+        "我走不下去",
+        "看不到出口",
+        "找不到方向",
+        "迷失方向"
+      ],
+      "worthlessness_mild": [
+        "我覺得自己很糟",
+        "我真的很糟糕",
+        "我好爛",
+        "我什麼都做不好",
+        "我做什麼都失敗",
+        "我一事無成",
+        "我覺得自己沒用",
+        "我真的很沒用",
+        "我好沒用",
+        "我討厭自己",
+        "我恨我自己",
+        "我厭惡自己",
+        "我配不上",
+        "我不值得",
+        "我不夠好"
+      ],
+      "isolation": [
+        "我好孤單",
+        "我覺得好孤獨",
+        "沒有人懂我",
+        "沒有人理解我",
+        "沒有人在乎我",
+        "沒人關心我",
+        "我一個人",
+        "我只有自己",
+        "我沒有朋友",
+        "我跟世界格格不入",
+        "我不屬於這裡"
+      ],
+      "help_seeking": [
+        "可以聽我說嗎",
+        "有人可以聽我說嗎",
+        "我需要有人聽我說",
+        "我需要幫助",
+        "我真的需要幫助",
+        "我需要人幫我",
+        "我不知道找誰",
+        "不知道可以找誰",
+        "我能找誰",
+        "我可以跟你說嗎",
+        "可以陪我聊聊嗎",
+        "請幫我",
+        "請幫幫我",
+        "幫幫我好嗎",
+        "心理諮商",
+        "找諮商師",
+        "看心理醫生"
+      ],
+      "warning_signs": [
+        "最近睡不著",
+        "我都睡不著",
+        "失眠很久了",
+        "我都吃不下",
+        "沒胃口",
+        "什麼都吃不下",
+        "我什麼都不想做",
+        "什麼都提不起勁",
+        "對什麼都沒興趣",
+        "我變得很麻木",
+        "我感覺不到什麼",
+        "我覺得空虛",
+        "我一直在喝酒",
+        "我最近都喝酒",
+        "靠酒精才能睡"
+      ]
+    },
+    "zh-CN": {
+      "emotional_distress": [
+        "我好难过",
+        "我真的很难过",
+        "我超难过",
+        "我好痛苦",
+        "我真的很痛苦",
+        "好痛苦",
+        "我好累",
+        "我真的好累",
+        "心好累",
+        "好疲惫",
+        "我快崩溃了",
+        "我要崩溃了",
+        "我崩溃了",
+        "我撑不住",
+        "我快撑不住了",
+        "好难撑",
+        "我很抑郁",
+        "我很沮丧",
+        "我很绝望",
+        "我心情很差",
+        "心情糟透了",
+        "心情烂透了",
+        "我觉得很糟",
+        "我觉得很烂",
+        "我觉得很无力",
+        "压力好大",
+        "压力快爆炸",
+        "我快要爆炸了",
+        "我哭了一整晚",
+        "我每天都在哭",
+        "我止不住地哭"
+      ],
+      "hopelessness_mild": [
+        "我看不到希望",
+        "好像没有希望",
+        "感觉没希望",
+        "我不知道该怎么办",
+        "我真的不知道该怎么办",
+        "感觉很无助",
+        "我好无助",
+        "我真的好无助",
+        "我觉得卡住了",
+        "我卡住了",
+        "我走不下去",
+        "看不到出口",
+        "找不到方向",
+        "迷失方向"
+      ],
+      "worthlessness_mild": [
+        "我觉得自己很糟",
+        "我真的很糟糕",
+        "我好烂",
+        "我什么都做不好",
+        "我做什么都失败",
+        "我一事无成",
+        "我觉得自己没用",
+        "我真的很没用",
+        "我好没用",
+        "我讨厌自己",
+        "我恨我自己",
+        "我厌恶自己",
+        "我配不上",
+        "我不值得",
+        "我不够好"
+      ],
+      "isolation": [
+        "我好孤单",
+        "我觉得好孤独",
+        "没有人懂我",
+        "没有人理解我",
+        "没有人在乎我",
+        "没人关心我",
+        "我一个人",
+        "我只有自己",
+        "我没有朋友",
+        "我跟世界格格不入",
+        "我不属于这里"
+      ],
+      "help_seeking": [
+        "可以听我说吗",
+        "有人可以听我说吗",
+        "我需要有人听我说",
+        "我需要帮助",
+        "我真的需要帮助",
+        "我需要人帮我",
+        "我不知道找谁",
+        "不知道可以找谁",
+        "我能找谁",
+        "我可以跟你说吗",
+        "可以陪我聊聊吗",
+        "请帮我",
+        "请帮帮我",
+        "帮帮我好吗",
+        "心理咨询",
+        "找咨询师",
+        "看心理医生"
+      ],
+      "warning_signs": [
+        "最近睡不着",
+        "我都睡不着",
+        "失眠很久了",
+        "我都吃不下",
+        "没胃口",
+        "什么都吃不下",
+        "我什么都不想做",
+        "什么都提不起劲",
+        "对什么都没兴趣",
+        "我变得很麻木",
+        "我感觉不到什么",
+        "我觉得空虚",
+        "我一直在喝酒",
+        "我最近都喝酒",
+        "靠酒精才能睡"
+      ]
+    },
+    "en": {
+      "emotional_distress": [
+        "i'm so sad",
+        "i'm really sad",
+        "i feel so sad",
+        "i'm in so much pain",
+        "i'm hurting so much",
+        "everything hurts",
+        "i'm exhausted",
+        "i'm so tired",
+        "i'm emotionally drained",
+        "i'm falling apart",
+        "i'm breaking down",
+        "i had a breakdown",
+        "i can't take it",
+        "i can barely cope",
+        "barely holding on",
+        "i'm so depressed",
+        "i feel so depressed",
+        "i'm really depressed",
+        "i feel hopeless",
+        "feel like giving up",
+        "i feel terrible",
+        "i feel awful",
+        "i feel like crap",
+        "i'm so stressed",
+        "i'm overwhelmed",
+        "completely overwhelmed",
+        "i cried all night",
+        "i can't stop crying",
+        "i cry every day"
+      ],
+      "hopelessness_mild": [
+        "i don't see any hope",
+        "feels hopeless",
+        "things feel hopeless",
+        "i don't know what to do",
+        "i have no idea what to do",
+        "i feel helpless",
+        "i feel so helpless",
+        "i feel stuck",
+        "i'm stuck",
+        "i can't move forward",
+        "i can't see a way out",
+        "lost direction"
+      ],
+      "worthlessness_mild": [
+        "i feel awful about myself",
+        "i feel terrible about myself",
+        "i can't do anything right",
+        "i fail at everything",
+        "i'm useless",
+        "i feel useless",
+        "i'm so useless",
+        "i hate myself",
+        "i really hate myself",
+        "i hate who i am",
+        "i'm not good enough",
+        "i don't deserve"
+      ],
+      "isolation": [
+        "i'm so lonely",
+        "i'm really lonely",
+        "i feel so lonely",
+        "i feel really lonely",
+        "i'm lonely all the time",
+        "i feel so alone",
+        "i feel completely alone",
+        "i feel all alone",
+        "no one understands",
+        "nobody understands me",
+        "no one gets me",
+        "no one cares",
+        "nobody cares about me",
+        "i don't have anyone",
+        "i have no friends",
+        "i'm all alone",
+        "i don't fit in",
+        "i don't belong"
+      ],
+      "help_seeking": [
+        "can someone listen",
+        "i need someone to talk to",
+        "i need help",
+        "i really need help",
+        "please help me",
+        "i don't know who to turn to",
+        "who can i talk to",
+        "can we talk",
+        "can i tell you something",
+        "i need therapy",
+        "i should see a therapist",
+        "i need to see someone",
+        "i need a counselor"
+      ],
+      "warning_signs": [
+        "i can't sleep",
+        "i haven't slept",
+        "i've been having insomnia",
+        "i can't eat",
+        "i have no appetite",
+        "i can't keep food down",
+        "i don't want to do anything",
+        "no motivation for anything",
+        "nothing interests me anymore",
+        "lost interest in everything",
+        "i feel numb",
+        "i feel nothing",
+        "i feel empty",
+        "i've been drinking a lot",
+        "drinking every night",
+        "can't sleep without alcohol"
+      ]
+    }
+  },
+  "NEGATION_CONTEXTS": {
+    "zh-TW": [
+      "不想自殺",
+      "不會自殺",
+      "沒有想自殺",
+      "不想死",
+      "不會去死",
+      "不想傷害自己",
+      "不會自殘",
+      "沒有自殘",
+      "以前想過",
+      "曾經想過",
+      "之前有過這種念頭",
+      "朋友想自殺",
+      "他想自殺",
+      "她想自殺",
+      "我同學想自殺",
+      "新聞說",
+      "看到新聞",
+      "報導說",
+      "電影裡",
+      "想自殺怎麼辦",
+      "如果想自殺",
+      "預防自殺",
+      "為什麼會想自殺",
+      "自殺防治",
+      "自殺率"
+    ],
+    "zh-CN": [
+      "不想自杀",
+      "不会自杀",
+      "没有想自杀",
+      "不想死",
+      "不会去死",
+      "不想伤害自己",
+      "不会自残",
+      "没有自残",
+      "以前想过",
+      "曾经想过",
+      "之前有过这种念头",
+      "朋友想自杀",
+      "他想自杀",
+      "她想自杀",
+      "我同学想自杀",
+      "新闻说",
+      "看到新闻",
+      "报道说",
+      "电影里",
+      "想自杀怎么办",
+      "如果想自杀",
+      "预防自杀",
+      "为什么会想自杀",
+      "自杀防治",
+      "自杀率"
+    ],
+    "en": [
+      "i don't want to die",
+      "i don't want to kill myself",
+      "i'm not going to kill myself",
+      "i wouldn't kill myself",
+      "i don't want to hurt myself",
+      "i'm not suicidal",
+      "i used to want to",
+      "i used to think about",
+      "in the past i",
+      "my friend wants to",
+      "he wants to kill",
+      "she wants to kill",
+      "the news said",
+      "i saw on the news",
+      "in the movie",
+      "what should i do if someone is suicidal",
+      "how to prevent suicide",
+      "suicide prevention",
+      "suicide rate",
+      "suicide statistics"
+    ]
+  }
+}
+"""#
+}

@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+._*
+
+# Xcode 建置產物與個人設定
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM
+*.dSYM.zip
+*.xcarchive
+*.xcresult
+
+# Swift Package Manager 建置快取
+.build/
+
+# 本機環境設定（保留範例檔）
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# 簽章憑證與私鑰
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+
+# 編輯器暫存檔
+*.swp
+*.swo
+*~
