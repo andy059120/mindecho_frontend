@@ -6,13 +6,27 @@ MindEcho 的 iOS 前端專案，使用 Swift 與 SwiftUI 開發，提供情緒�
 
 - 帳號註冊、登入與個人資料管理。
 - AI 聊天、每日狀態填寫、情緒日記與心理量表。
-- HealthKit 健康資料整合與每日提醒。
+- 每日提醒通知。
+
+## HealthKit 保留功能
+
+專案保留 `mindecho/hooks/HealthKitManager.swift` 與 `mindecho/pages/Diary/HealthDataView.swift`，已實作讀取心率變異（HRV）、深層睡眠時數、步數與體重，以及對應的健康資料畫面。
+
+目前正式畫面沒有導向 `HealthDataView` 的入口；HealthKit 讀取由該頁面的 `onAppear` 觸發，因此目前正常操作流程不會觸發這項功能。專案仍保留 HealthKit capability 與權限用途說明。追蹤頁的五項指標使用每日填寫資料，並非由 HealthKit 取得。
+
+這些 Swift 程式與設定先保留，Flutter 第一階段不納入 HealthKit／Health Connect 整合。
+
+## Flutter 移植方向
+
+- 第一階段先開發及驗收 iOS，最低支援版本維持 iOS 17.6。
+- Android 與 Web 留待後續階段；共用程式設計時保留跨平台擴充空間。
+- 目前尚未建立 Flutter 專案；本節記錄預定方向。
 
 ## 開發環境
 
 - macOS 與 Xcode（含 iOS SDK）。
 - Swift 5。
-- App target 的最低部署版本為 iOS 16.6；測試 target 為 iOS 17.2。
+- App target 的最低部署版本為 iOS 17.6；Project 層級與單元測試 target 為 iOS 17.2。
 
 ## 啟動方式
 
