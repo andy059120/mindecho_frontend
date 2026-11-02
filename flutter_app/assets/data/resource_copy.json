@@ -1,0 +1,213 @@
+{
+  "GuideDetailView": [
+    "心理健康指南",
+    "📚 使用說明",
+    "• 本指南提供基礎心理健康知識",
+    "• 內容僅供參考，不能替代專業醫療建議",
+    "• 如有嚴重症狀，請尋求專業協助",
+    "• 定期閱讀有助於提升心理健康意識",
+    "查看"
+  ],
+  "TechniquesDetailView": [
+    "情緒管理小技巧",
+    "💡 使用建議",
+    "• 選擇適合自己的技巧定期練習",
+    "• 在情緒平穩時先學習技巧",
+    "• 持續練習才能見到效果",
+    "• 結合多種技巧效果更佳",
+    "步驟："
+  ],
+  "HotlineDetailView": [
+    "24 小時心理諮詢與求助資源",
+    "遇到危急情況請優先撥打 112、119 或 110，其他專線與網站可依需求尋求協助。",
+    "使用提醒",
+    "• 如有立即危險，請先聯絡緊急救援單位",
+    "• 大多數專線提供匿名或保密協談服務",
+    "• 網站資源可提供更多地區性諮商與轉介資訊"
+  ],
+  "MapDetailView": [
+    "附近心理診所",
+    "🏥 就醫提醒",
+    "• 建議事先電話預約",
+    "• 攜帶健保卡和身分證件",
+    "• 可準備相關病史和用藥紀錄",
+    "• 如需要可請家人陪同",
+    "導航",
+    "預約"
+  ],
+  "techniques": [
+    {
+      "title": "深呼吸練習",
+      "description": "先觀察自己的呼吸，再慢慢把吐氣拉長",
+      "steps": [
+        "先感受自己吸氣、吐氣的比例",
+        "嘗試把呼吸的比例調整成 1：1",
+        "接著再慢慢試著把吸氣、吐氣的比例約為 1：2",
+        "例如吸氣 4 秒，吐氣 6～8 秒",
+        "持續練習 5 分鐘"
+      ],
+      "symbol": "lungs.fill"
+    },
+    {
+      "title": "正念冥想",
+      "description": "專注當下，觀察思緒和感受",
+      "steps": [
+        "找安靜環境",
+        "閉眼專注呼吸",
+        "觀察念頭飄過",
+        "持續5-10分鐘"
+      ],
+      "symbol": "brain.head.profile"
+    },
+    {
+      "title": "肌肉放鬆",
+      "description": "漸進式肌肉放鬆技巧",
+      "steps": [
+        "繃緊肌肉5秒",
+        "突然放鬆",
+        "感受對比",
+        "從腳到頭依序進行"
+      ],
+      "symbol": "figure.flexibility"
+    },
+    {
+      "title": "情緒日記",
+      "description": "記錄和分析情緒變化",
+      "steps": [
+        "記錄觸發事件",
+        "描述情緒感受",
+        "分析思維模式",
+        "尋找應對方式"
+      ],
+      "symbol": "book.fill"
+    }
+  ],
+  "hotlines": [
+    {
+      "kind": "phone",
+      "title": "112 緊急救難專線",
+      "value": "112",
+      "description": "緊急救援與通報"
+    },
+    {
+      "kind": "phone",
+      "title": "119 消防局",
+      "value": "119",
+      "description": "火警、救護與緊急救援"
+    },
+    {
+      "kind": "phone",
+      "title": "110 警察局",
+      "value": "110",
+      "description": "治安事件與緊急報案"
+    },
+    {
+      "kind": "phone",
+      "title": "1925 衛生福利部安心專線",
+      "value": "1925",
+      "description": "24 小時心理支持與危機協談"
+    },
+    {
+      "kind": "phone",
+      "title": "1995 生命線",
+      "value": "1995",
+      "description": "24 小時免費心理諮詢服務"
+    },
+    {
+      "kind": "phone",
+      "title": "1980 張老師專線",
+      "value": "1980",
+      "description": "輔導與情緒支持"
+    },
+    {
+      "kind": "phone",
+      "title": "0800-788-995 安心專線",
+      "value": "0800788995",
+      "description": "心理健康諮詢服務"
+    },
+    {
+      "kind": "phone",
+      "title": "(02)2505-9595 台北市生命線自殺防治熱線",
+      "value": "0225059595",
+      "description": "自殺防治與危機支持"
+    },
+    {
+      "kind": "phone",
+      "title": "0800-001-769 踹貢少年專線",
+      "value": "0800001769",
+      "description": "青少年協談專線"
+    },
+    {
+      "kind": "phone",
+      "title": "(02)2369-2696 宇宙光關懷熱線",
+      "value": "0223692696",
+      "description": "免費協談與關懷支持"
+    },
+    {
+      "kind": "phone",
+      "title": "(02)2768-7733 觀音線",
+      "value": "0227687733",
+      "description": "免費協談與陪伴資源"
+    },
+    {
+      "kind": "link",
+      "title": "衛生福利部心理健康司",
+      "value": "https://dep.mohw.gov.tw/domhaoh/np-326-107.html",
+      "description": "官方心理健康與諮商資源"
+    },
+    {
+      "kind": "link",
+      "title": "心理諮商資源與求助管道",
+      "value": "https://www.gov.tw/News_Content_26_826198",
+      "description": "我的 E 政府整理的求助資訊"
+    },
+    {
+      "kind": "link",
+      "title": "全台各地輔導專線",
+      "value": "https://reurl.cc/EmQOEn",
+      "description": "各縣市輔導與求助窗口"
+    },
+    {
+      "kind": "link",
+      "title": "愛牽手專線（觀音線）",
+      "value": "https://www.kuanyin-line.org/empty_19718.php",
+      "description": "觀音線服務介紹與求助說明"
+    },
+    {
+      "kind": "phone",
+      "title": "113 社會局保護專線",
+      "value": "113",
+      "description": "家庭暴力、兒少與性侵害保護"
+    },
+    {
+      "kind": "phone",
+      "title": "0800-770-885 毒品危害防制中心諮詢專線",
+      "value": "0800770885",
+      "description": "毒品防制與戒治諮詢"
+    },
+    {
+      "kind": "phone",
+      "title": "0800-228-585 老朋友專線",
+      "value": "0800228585",
+      "description": "長者關懷與陪伴支持"
+    },
+    {
+      "kind": "phone",
+      "title": "0800-013-999 男性關懷專線",
+      "value": "0800013999",
+      "description": "男性情緒與生活支持"
+    },
+    {
+      "kind": "phone",
+      "title": "165 反詐騙諮詢專線",
+      "value": "165",
+      "description": "詐騙通報與諮詢"
+    },
+    {
+      "kind": "phone",
+      "title": "1957 社福專線",
+      "value": "1957",
+      "description": "社會福利與急難救助諮詢"
+    }
+  ]
+}

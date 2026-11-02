@@ -20,7 +20,8 @@ MindEcho 的 iOS 前端專案，使用 Swift 與 SwiftUI 開發，提供情緒�
 
 - 第一階段先開發及驗收 iOS，最低支援版本維持 iOS 17.6。
 - Android 與 Web 留待後續階段；共用程式設計時保留跨平台擴充空間。
-- 目前尚未建立 Flutter 專案；本節記錄預定方向。
+- Flutter 專案位於 `flutter_app/`，SDK 固定為 Flutter 3.47.8，iOS Bundle ID 為 `com.mindecho-5`。
+- 已加入登入、聊天與四個主要分頁的 Flutter 實作；目前完成範圍、待驗收項目與啟動方式見 [Flutter README](flutter_app/README.md)。
 
 ## 開發環境
 

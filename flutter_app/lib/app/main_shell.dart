@@ -1,0 +1,246 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
+
+import '../core/platform/local_media_store.dart';
+import '../core/storage/account_store.dart';
+import '../features/auth/auth_controller.dart';
+import '../features/check_in/check_in_page.dart';
+import '../features/chat/chat_content.dart';
+import '../features/chat/chat_list_page.dart';
+import '../features/dashboard/catalog.dart';
+import '../features/dashboard/controller.dart';
+import '../features/dashboard/home_page.dart';
+import '../features/dashboard/repository.dart';
+import '../features/dashboard/tracking_page.dart';
+import '../features/profile/profile_page.dart';
+import '../shared/system_symbol.dart';
+import '../shared/tab_tour_overlay.dart';
+
+class MainShell extends StatefulWidget {
+  const MainShell({
+    required this.auth,
+    required this.content,
+    required this.catalog,
+    this.store,
+    this.promptCheckIn = true,
+    super.key,
+  });
+  final AuthController auth;
+  final ChatContent content;
+  final DashboardCatalog catalog;
+  final AccountStore? store;
+  final bool promptCheckIn;
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  late final _controller = DashboardController(
+    DashboardRepository(widget.auth),
+  );
+  late final _accountId =
+      (widget.auth.session!.user['userId'] ??
+              widget.auth.session!.user['id'] ??
+              widget.auth.session!.user['email'])
+          as String;
+  late final _store = widget.store ?? KeychainAccountStore(_accountId);
+  late final _media = LocalMediaStore(_accountId, _store);
+  final _navigatorKeys = List.generate(4, (_) => GlobalKey<NavigatorState>());
+  int _tab = 0;
+  int? _tour;
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    await _controller.refresh();
+    if (!mounted ||
+        !widget.promptCheckIn ||
+        _controller.errors['metrics'] != null ||
+        _controller.completedToday ||
+        widget.auth.session == null) {
+      return;
+    }
+    await Navigator.of(context).push(
+      CupertinoPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => CheckInPage(controller: _controller),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
+    return CupertinoPageScaffold(
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    IndexedStack(
+                      index: _tab,
+                      children: [
+                        for (var i = 0; i < 4; i++)
+                          CupertinoTabView(
+                            navigatorKey: _navigatorKeys[i],
+                            builder: (context) => switch (i) {
+                              0 => HomePage(
+                                controller: _controller,
+                                store: _store,
+                                media: _media,
+                                catalog: widget.catalog,
+                                onTour: () => setState(() => _tour = 0),
+                              ),
+                              1 => ChatListPage(
+                                auth: widget.auth,
+                                content: widget.content,
+                                embedded: true,
+                              ),
+                              2 => TrackingPage(
+                                controller: _controller,
+                                store: _store,
+                              ),
+                              _ => ProfilePage(
+                                controller: _controller,
+                                media: _media,
+                              ),
+                            },
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (!(_tab == 1 && keyboard))
+                ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: CupertinoColors.systemBackground.withValues(
+                          alpha: .8,
+                        ),
+                        border: const Border(
+                          top: BorderSide(
+                            color: CupertinoColors.separator,
+                            width: .5,
+                          ),
+                        ),
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        child: SizedBox(
+                          height: 70,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: Row(
+                              children: [
+                                for (var i = 0; i < 4; i++)
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 8,
+                                      ),
+                                      child: CupertinoButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () =>
+                                            setState(() => _tab = i),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            color: _tab == i
+                                                ? CupertinoColors.systemOrange
+                                                      .withValues(alpha: .15)
+                                                : null,
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SystemSymbol(
+                                                _tabs[i].$2,
+                                                size: 15,
+                                                weight: 'semibold',
+                                                color: _tab == i
+                                                    ? CupertinoColors
+                                                          .systemOrange
+                                                    : CupertinoColors
+                                                          .secondaryLabel,
+                                                fallback: _tabs[i].$3,
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                _tabs[i].$1,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: _tab == i
+                                                      ? CupertinoColors
+                                                            .systemOrange
+                                                      : CupertinoColors
+                                                            .secondaryLabel,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (_tour != null)
+            Positioned.fill(
+              child: TabTourOverlay(
+                index: _tour!,
+                title: _tabs[_tour!].$1,
+                message: _tourText[_tour!],
+                onClose: () => setState(() => _tour = null),
+                onNext: () =>
+                    setState(() => _tour = _tour == 3 ? null : _tour! + 1),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+const _tabs = [
+  ('首頁', 'house', CupertinoIcons.house),
+  ('聊天', 'bubble.left', CupertinoIcons.chat_bubble),
+  ('追蹤', 'chart.bar', CupertinoIcons.chart_bar),
+  ('個人檔案', 'person', CupertinoIcons.person),
+];
+const _tourText = [
+  '總覽你的狀態與每日提醒。',
+  '和 AI 進行對話、整理感受。',
+  '記錄情緒與日記、追蹤變化。',
+  '管理個人資料與重要聯絡資訊。',
+];

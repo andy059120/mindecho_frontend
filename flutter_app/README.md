@@ -1,0 +1,145 @@
+# MindEcho Flutter
+
+同一個 repository 中的 Flutter iOS 移植專案。Swift 專案保留於上層 `mindecho/`，供功能與畫面對照。
+
+## 固定環境
+
+- Flutter **3.47.8 stable**，Dart **3.13.7**；版本記錄於 `.fvmrc`，套件版本記錄於 `pubspec.lock`。
+- iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-5`**，App 顯示名稱 **MindEcho**。
+- 本階段僅產生 iOS host；Android、Web 尚未建立或驗收。
+
+## 啟動
+
+安裝 FVM 與 Xcode 後，在本資料夾執行：
+
+```sh
+fvm use 3.47.8
+fvm flutter pub get
+fvm flutter run
+```
+
+實機執行請開啟 `ios/Runner.xcworkspace`，在 Runner 的 Signing & Capabilities 選擇自己的開發團隊，並確認該團隊可使用 `com.mindecho-5`。專案未固定個人開發團隊。
+
+預設重用 Swift 的 `https://mindechoserver.com:8443/api`。需要切換環境時：
+
+```sh
+fvm flutter run --dart-define=API_BASE_URL=https://your-server.example/api
+```
+
+帳號密碼只從登入表單輸入，不應寫入原始碼、dart-define、文件或測試 fixture。HTTP client 不記錄帳密、token 或對話內容，也不略過 TLS 憑證驗證。
+
+## 目前移植範圍
+
+已實作歡迎、登入、註冊、忘記密碼與隱私政策；登入後顯示首頁、聊天、追蹤與個人檔案四個分頁，各自保留導覽狀態。
+
+- 沿用 `/auth/login`、`/auth/register`、`/auth/reset-password`、`/auth/refresh`、`/auth/logout`、`/chat/sessions` 與訊息 API。
+- 支援 `token`／`accessToken`、`user`／`userData` 回應欄位。
+- iOS Keychain 儲存 session 與選擇記住的 email；不儲存密碼。
+- 401 共用一次 token refresh，每個原請求最多重送一次；其他失敗不自動重送聊天 POST，以免重複建立訊息。
+- 聊天列表支援分頁、下拉更新與刪除確認。
+- 初談結束時可依後端 `initialMode` 建立建議模式的新聊天室。
+- 使用 Cupertino 元件，沿用 Swift 品牌色、App 圖示、五種模式文案、歡迎訊息與危機字詞語料。危機警示可查看登入回應中的緊急聯絡資訊。
+
+UI 還原以 Swift 程式與同尺寸模擬器畫面為依據。未登入時先顯示四頁歡迎輪播；登入與註冊採全螢幕呈現，政策與忘記密碼使用 sheet。iOS 以輕量 MethodChannel 取得原版 SF Symbols 的系統字形，頁面與狀態仍由 Flutter 繪製與管理。
+
+本輪已加入：
+
+| 區域 | 已實作內容 |
+| --- | --- |
+| 首頁 | 五項指標圖表與期間篩選、每日檢測紀錄、40 則箴言轉盤、檢測／日記提醒、9 份量表入口、收藏捷徑、求助資源與日記輸入 |
+| 每日檢測 | 未完成時的登入提醒、五題作答、上一步、提交與失敗重試、結果分數與圓環；沿用 `/main/dailyQuestions` 欄位題序 |
+| 追蹤 | 五項指標、每週概況、日記月曆與歷史、量表近五次紀錄與篩選；資料來源為既有 API |
+| 日記 | 新增、讀取、編輯與刪除確認、依帳號與日期保存草稿；晚到的伺服器資料不覆蓋已編輯草稿 |
+| 量表 | 原版 9 份題目、選項、反向計分、RFQ C/U 計分、作答檢視與結果文案；送出成功後才顯示完成 |
+| 個人檔案 | 使用者卡片、基本資料讀取、姓名與 email 更新、頭貼選擇、本機時光寶盒、緊急聯絡、回饋入口與登出 |
+| 時光寶盒 | 文字新增／編輯、圖片與影片匯入／預覽、同類排序、刪除確認；與 Swift 一樣儲存在本機 |
+| 資源 | 原版求助資源與情緒管理文案、四類共 12 支放鬆影片，沿用原連結 |
+
+**完整 App 的 1:1 驗收仍未完成。** 目前以原始 Swift 實作和同尺寸模擬器逐頁對照，主要頁面已加入，仍需針對完整量表／日記／收藏流程、彈出頁面、鍵盤、動畫及細部視覺差異繼續驗收。提醒通知與完整模式切換尚未移植；箴言轉盤音效尚未移植。
+
+### API 與資料保存注意事項
+
+- 重用 `/main/dailyQuestions`、`/diaries`、`/user/profile`、`/main/scales/sessions` 與 `/main/scales/{code}/answers`；靜態題目與文案由 Swift 原始碼轉存為 JSON。
+- **日記更新相容性待驗證**：Swift 的更新操作使用 DELETE 後 POST。Flutter 目前使用 `PATCH /diaries/{id}`，不在失敗時自動刪除舊文章。真實後端是否支援 PATCH 尚未驗證；若不支援，編輯會顯示失敗並保留原紀錄與草稿，需要後續確認更新契約。日記新增及刪除使用既有 POST／DELETE。
+- 個人資料更新沿用 Swift 的 `user_id`、`email`、`firstName`、`lastName`；出生年月目前僅顯示，尚未加入後端未確認的更新欄位。
+- 真實帳號驗證僅登入與讀取。本輪未提交健康檢測、日記、量表或個人資料變更；寫入流程使用 Mock HTTP 驗證。
+- 時光寶盒及頭貼圖片／影片放在 App Documents；中繼資料、日記草稿與 session 使用 Keychain。檔案使用相對檔名，依帳號分開；登出保留本機收藏與草稿供該帳號下次使用。
+- 不同 Bundle ID 的 Swift／Flutter 本機收藏與草稿不會自動同步。
+
+HealthKit 程式及設定繼續保留於 Swift，Flutter 本階段不接入，也不新增健康權限。
+
+`com.mindecho-5` 與 Swift App 的 `com.mindecho-2` 各自使用獨立的 App sandbox；Swift 本機 session、草稿與收藏不會自動帶入。後端既有資料則透過相同帳號與 API 存取。
+
+## 資料夾
+
+```text
+lib/
+  app/                  App 啟動、四分頁導覽與品牌樣式
+  core/network/         API client、錯誤與逾時處理
+  core/storage/         session、帳號資料與 Keychain
+  core/platform/        iOS 本機媒體儲存 adapter
+  features/auth/        歡迎、登入、註冊、密碼重設、政策與 session refresh
+  features/chat/        模式、API repository、列表與對話
+  features/dashboard/   首頁、追蹤、共用資料、圖表及靜態內容
+  features/check_in/    每日檢測與結果
+  features/diary/        月曆、日記與草稿
+  features/scales/       量表作答、計分與提交
+  features/profile/      個人資訊、頭貼與本機收藏
+  features/resources/    求助資源、情緒管理與放鬆影片
+  shared/               共用 UI
+assets/data/            從 Swift 沿用的固定內容
+```
+
+## 驗證
+
+```sh
+fvm flutter analyze
+fvm flutter test
+fvm flutter build ios --simulator --debug --no-codesign
+```
+
+自動化測試使用記憶體儲存與模擬 HTTP 回應，不連線真實後端。涵蓋登入欄位相容性、錯誤密碼、並行 401 refresh、過期 session、登出與 refresh 競態、聊天 API contract、危機語料，以及登入到聊天再登出的 widget 流程。
+
+`--no-codesign` 僅用於驗證編譯；要在模擬器操作 Keychain，請使用正常的 `fvm flutter run` 流程。直接安裝未簽章的產物可能導致 Keychain 初始化失敗。
+
+模擬器編譯成功不代表已在 iOS 17.6 實機驗收；發布前仍需測試最低支援系統、Keychain 與完整後端流程。
+
+## 本次驗收紀錄（2026-10-30）
+
+- `flutter analyze` 通過；10 項自動化測試通過。
+- iOS 模擬器編譯通過，產物的 Bundle ID 為 `com.mindecho-5`、MinimumOSVersion 為 `17.6`。
+- iPhone 17 Pro／iOS 26.5 模擬器實際驗證：既有帳號登入、讀取既有列表、建立測試聊天室、發送訊息、顯示後端回覆、重開 App 後恢復登入、重新讀取後端訊息、登出。
+- 依使用者要求保留 `flutter-smoke-20261030` 測試對話；未刪除既有對話，未將測試帳密寫入專案。
+- iOS 17.6 實機及完整 Swift UI 對照仍待驗收。
+
+## UI 對照紀錄（2026-11-02）
+
+- 在同一台 iPhone 17 Pro Max／iOS 26.5 模擬器切換 Swift 與 Flutter，對照歡迎及登入畫面。
+- 還原四頁輪播、原版 Logo／插圖、字型、漸層、頁碼圓點、按鈕尺寸、輸入框邊框、勾選框、關閉與政策入口。
+- 註冊保留兩步驟、性別／教育程度、出生年月、1–3 位緊急聯絡人與重要的一段話；API 沿用既有後端。政策文字自 Swift 原始碼轉存。
+- 新增入口導覽、註冊前後步驟、政策閱讀與關閉、忘記密碼及 320／402／440 寬度的版面回歸測試；真實後端未新增帳號或修改密碼。
+- 原 Swift 原始碼與 Bundle ID 保留，不改動。
+- 19 項測試通過；歡迎／登入排版已在三種寬度與鍵盤彈出狀態檢查。
+
+## 四分頁移植驗證（2026-11-02）
+
+- 自動化測試共 29 項，含原有登入／聊天測試、每日檢測欄位映射與失敗重試、日記載入與草稿保留、更新失敗不刪原文、量表題數與計分、跨月／跨年圖表分組。
+- 四分頁切換與首頁捲動已在 320×568、402×874、440×956 測試；每日檢測問題與結果頁包含小螢幕回歸測試。
+- iPhone 17 Pro 及 Pro Max／iOS 26.5 模擬器成功建置與登入。於同一台 Pro Max 切換 Swift／Flutter，對照首頁、追蹤與個人檔案；讀取既有量表與聯絡資料，未修改後端紀錄。
+- API 真實寫入、照片／相機授權、影片實際播放與 iOS 17.6 實機尚待驗收；模擬器建置成功不代表上述項目已通過。
+
+## 純前端視覺對照（2026-11-02）
+
+本輪依 Swift 原版調整 UI，保留 API、認證、資料模型、計分與本機保存方法。
+
+- 首頁：量表卡片改為 160×180、資源／快捷卡片 160×140；對齊單行截斷、漸層與 SF Symbols。
+- 聊天：原版模式漸層卡片、白色紀錄區、聊天室介紹 sheet、白色對話頁首、模式外觀、AI 頭像與氣泡圓角、輸入框邊框與橫向快速回覆。快速回覆只填入文字，送出仍使用原有按鈕與請求。
+- 日記：月曆、心情選擇、輸入區與儲存區改回分開排列；對齊米白卡片、心情邊框、日期與歷史入口。草稿與儲存行為維持原實作。
+- 量表：沿用 Swift 的 9 份簡介，還原進度條、選項分數、答案檢視、結果卡片；追蹤頁補上原版表格與圖表框線。
+- 資源：恢復原版求助資源分組、技巧卡片的圖示與步驟編號，以及放鬆頁的四種分類與影片縮圖外觀。
+- 個人檔案：時光寶盒的新增按鈕與空狀態、回饋入口及紅色登出按鈕。
+- 分頁：膠囊分段選單、選取動畫、底部模糊背景，以及帶局部鏤空的功能介紹提示。
+
+視覺回歸包含 320／402／440 寬度、彈出頁面、長內容捲動、導覽提示與鍵盤。模式切換的後端功能、列表摘要與訊息時間等尚未暴露給現有 ViewModel 的資料，本輪不擴充；系統原生 sheet／選單及不同 iOS 版本的字型與動態材質，仍需逐狀態對照，不能視為全 App 逐像素驗收完成。
+
+本輪驗證：`flutter analyze` 通過、33 項測試通過；iPhone 17 Pro Max／iOS 26.5 的正常簽章模擬器建置通過。測試涵蓋介紹頁、資源頁、量表與日記捲動、導覽提示和快速回覆；真實帳號僅登入與讀取，未新增或修改後端內容。

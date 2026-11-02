@@ -1,0 +1,1005 @@
+[
+  {
+    "code": "CESD20",
+    "title": "CES-D 憂鬱量表",
+    "count": 20,
+    "instructions": "請依「過去一週內」的情形作答（4、8、12、16為反向題）",
+    "reverseIndices": [
+      4,
+      8,
+      12,
+      16
+    ],
+    "questions": [
+      {
+        "id": "cesd_1",
+        "text": "原來不介意的事最近竟然會困擾我",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_2",
+        "text": "我的胃口不好，不想吃東西",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_3",
+        "text": "即使有親人的幫忙，我還是無法拋開煩惱",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_4",
+        "text": "我覺得我和別人一樣好",
+        "isReverse": true
+      },
+      {
+        "id": "cesd_5",
+        "text": "我做事時無法集中精神",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_6",
+        "text": "我覺得悶悶不樂",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_7",
+        "text": "我做任何事都覺得費力",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_8",
+        "text": "我對未來充滿希望",
+        "isReverse": true
+      },
+      {
+        "id": "cesd_9",
+        "text": "我認為我的人生是失敗的",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_10",
+        "text": "我覺得恐懼",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_11",
+        "text": "我睡得不安寧",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_12",
+        "text": "我是快樂的",
+        "isReverse": true
+      },
+      {
+        "id": "cesd_13",
+        "text": "我比平日不愛說話",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_14",
+        "text": "我覺得寂寞",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_15",
+        "text": "人們是不友善的",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_16",
+        "text": "我享受了生活的樂趣",
+        "isReverse": true
+      },
+      {
+        "id": "cesd_17",
+        "text": "我曾經痛哭",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_18",
+        "text": "我覺得悲傷",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_19",
+        "text": "我覺得別人不喜歡我",
+        "isReverse": false
+      },
+      {
+        "id": "cesd_20",
+        "text": "我缺乏幹勁",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "沒有或極少",
+        "score": 0
+      },
+      {
+        "label": "有時候",
+        "score": 1
+      },
+      {
+        "label": "時常",
+        "score": 2
+      },
+      {
+        "label": "常常",
+        "score": 3
+      }
+    ],
+    "ranges": [
+      11,
+      11
+    ],
+    "feedback": {
+      "low": "你的分數落在常模範圍內（≤11），目前沒有顯著的憂鬱警訊。請持續留意情緒與生活作息。",
+      "medium": "你的分數落在常模範圍內（≤11），目前沒有顯著的憂鬱警訊。請持續留意情緒與生活作息。",
+      "high": "你的分數高於常模（>11）。建議進一步評估憂鬱的可能性，並尋求身心健康專業人員的協助（如學校輔導人員、心理師、精神醫療院所）。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "CES-D Depression Scale",
+    "icon": "heart.circle.fill"
+  },
+  {
+    "code": "BSRS5",
+    "title": "BSRS-5 簡式健康量表",
+    "count": 5,
+    "instructions": "最近一週內的感受",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "bsrs_1",
+        "text": "感覺緊張不安",
+        "isReverse": false
+      },
+      {
+        "id": "bsrs_2",
+        "text": "覺得容易苦惱或動怒",
+        "isReverse": false
+      },
+      {
+        "id": "bsrs_3",
+        "text": "感覺憂鬱、心情低落",
+        "isReverse": false
+      },
+      {
+        "id": "bsrs_4",
+        "text": "覺得比不上別人",
+        "isReverse": false
+      },
+      {
+        "id": "bsrs_5",
+        "text": "睡眠困難（難入睡、易醒或早醒）",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "完全沒有",
+        "score": 0
+      },
+      {
+        "label": "輕微",
+        "score": 1
+      },
+      {
+        "label": "中等程度",
+        "score": 2
+      },
+      {
+        "label": "厲害",
+        "score": 3
+      },
+      {
+        "label": "非常厲害",
+        "score": 4
+      }
+    ],
+    "ranges": [
+      11,
+      18
+    ],
+    "feedback": {
+      "low": "目前你的心理壓力程度偏低，身心狀態大致穩定，能夠應付日常生活。",
+      "medium": "你可能正在承受一定程度的心理壓力，身心已有一些提醒訊號。適時休息、調整節奏，對你會有所幫助。",
+      "high": "你的心理負荷目前較重，這表示你已經努力撐了一段時間。尋求支持並不是脆弱，而是一種照顧自己的方式。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Brief Symptom Rating Scale-5",
+    "icon": "list.clipboard.fill"
+  },
+  {
+    "code": "SATS8",
+    "title": "SATS 消沉傾向量表",
+    "count": 8,
+    "instructions": "請依近期感受作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "sats_1",
+        "text": "我心裡有空洞的感覺",
+        "isReverse": false
+      },
+      {
+        "id": "sats_2",
+        "text": "我無法決定我的未來",
+        "isReverse": false
+      },
+      {
+        "id": "sats_3",
+        "text": "面對生活，我有無力感",
+        "isReverse": false
+      },
+      {
+        "id": "sats_4",
+        "text": "我的生活像是掉入漩渦裡面",
+        "isReverse": false
+      },
+      {
+        "id": "sats_5",
+        "text": "我會沉溺在某些事情上而打亂生活作息",
+        "isReverse": false
+      },
+      {
+        "id": "sats_6",
+        "text": "這一段時間以來，我的生活作息混亂",
+        "isReverse": false
+      },
+      {
+        "id": "sats_7",
+        "text": "我對於人常常有失望的感覺",
+        "isReverse": false
+      },
+      {
+        "id": "sats_8",
+        "text": "和別人親近常常讓我覺得不自在",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "完全不符合",
+        "score": 1
+      },
+      {
+        "label": "很不符合",
+        "score": 2
+      },
+      {
+        "label": "大多不符合",
+        "score": 3
+      },
+      {
+        "label": "部分符合",
+        "score": 4
+      },
+      {
+        "label": "大多符合",
+        "score": 5
+      },
+      {
+        "label": "很符合",
+        "score": 6
+      },
+      {
+        "label": "完全符合",
+        "score": 7
+      }
+    ],
+    "ranges": [
+      23,
+      37
+    ],
+    "feedback": {},
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "SATS Scale",
+    "icon": "cloud.rain.fill"
+  },
+  {
+    "code": "PCS12",
+    "title": "PCS 心理資本量表",
+    "count": 12,
+    "instructions": "請依實際狀況作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "pcs_1",
+        "text": "我有信心能分析長遠的問題，並找到解決的方法",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_2",
+        "text": "與主管開會時，我有信心表達自己工作範圍的事務",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_3",
+        "text": "我有信心能設定對工作領域有幫助的目標",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_4",
+        "text": "眼前我認為自己在工作上相當成功",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_5",
+        "text": "我可以想出很多方法來達到我的工作目標",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_6",
+        "text": "目前我正逐步達成自己設定的工作目標",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_7",
+        "text": "我總是會嘗試各種方法來處理難題",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_8",
+        "text": "我能獨立完成自己分內的工作",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_9",
+        "text": "在目前的工作上，我感覺自己能同時處理很多事情",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_10",
+        "text": "面對工作上的不確定性，我總是往最好的地方想",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_11",
+        "text": "在工作時，我總是看到事情的光明面",
+        "isReverse": false
+      },
+      {
+        "id": "pcs_12",
+        "text": "對於工作上即將發生的事，我都能樂觀以對",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "非常不同意",
+        "score": 1
+      },
+      {
+        "label": "不同意",
+        "score": 2
+      },
+      {
+        "label": "普通",
+        "score": 3
+      },
+      {
+        "label": "同意",
+        "score": 4
+      },
+      {
+        "label": "非常同意",
+        "score": 5
+      }
+    ],
+    "ranges": [
+      28,
+      44
+    ],
+    "feedback": {
+      "low": "目前你感受到的內在心理資源較少，可能覺得缺乏希望感或自信。這並非能力不足，而是你可能需要更多支持與補充。",
+      "medium": "你擁有部分心理資源，在某些情境中能支持自己，但在壓力下仍會感到動搖。",
+      "high": "你擁有較多正向心理資源，在面對困難時，能較容易相信自己並持續前行。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Psychological Capital Scale",
+    "icon": "sparkles"
+  },
+  {
+    "code": "CDRISC25",
+    "title": "CD-RISC 復原力量表",
+    "count": 25,
+    "instructions": "請依實際狀況作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "cdr_1",
+        "text": "當改變發生時，我能適應。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_2",
+        "text": "面臨壓力時，我至少有一個親近且安全的人際關係可以幫助我。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_3",
+        "text": "當我的問題沒有清楚的答案時，命運或神有時會幫助我。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_4",
+        "text": "不管發生什麼事情，我都能處理。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_5",
+        "text": "過去的成功讓我有信心去處理新的挑戰和困難。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_6",
+        "text": "當我面對問題時，我試著去看事情幽默的一面。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_7",
+        "text": "克服壓力而使我更堅強。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_8",
+        "text": "生病、受傷或苦難之後，我很容易就能恢復過來。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_9",
+        "text": "不管好事或壞事，我相信事出必有因。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_10",
+        "text": "不管結果如何，我都會盡最大的努力。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_11",
+        "text": "即使有阻礙，我相信我能達成我的目標。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_12",
+        "text": "即使看起來沒有希望了，我仍然不放棄。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_13",
+        "text": "壓力或危機來時，我知道去哪裡尋求幫助。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_14",
+        "text": "在壓力之下，我可以專注並且能清楚地思考。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_15",
+        "text": "我寧願自己主導去解決問題，而不是全由別人做決定。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_16",
+        "text": "我不會因失敗而很容易氣餒。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_17",
+        "text": "處理生命中的挑戰和困難時，我認為我是一個堅強的人。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_18",
+        "text": "如果有必要，我可以做一個不受歡迎或困難的決定而去影響別人。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_19",
+        "text": "我能處理一些不愉快或痛苦的感覺，例如：悲傷、害怕和生氣。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_20",
+        "text": "處理生活問題時，有時候必須憑直覺，而不知道為什麼要這樣做。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_21",
+        "text": "我非常清楚我生命的意義。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_22",
+        "text": "我覺得我可以掌握我的人生。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_23",
+        "text": "我喜歡挑戰。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_24",
+        "text": "不管人生的路途中遇到什麼阻礙，我會努力達成我的目標。",
+        "isReverse": false
+      },
+      {
+        "id": "cdr_25",
+        "text": "我為我的成就而得意。",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "從不",
+        "score": 0
+      },
+      {
+        "label": "很少",
+        "score": 1
+      },
+      {
+        "label": "有時",
+        "score": 2
+      },
+      {
+        "label": "經常",
+        "score": 3
+      },
+      {
+        "label": "幾乎總是",
+        "score": 4
+      }
+    ],
+    "ranges": [
+      58,
+      92
+    ],
+    "feedback": {
+      "low": "你近期面對的壓力可能已超過負荷，復原與調適的能量暫時較低。這不代表你不夠堅強，而是你已經撐很久了。",
+      "medium": "你具備一定程度的復原能力，但在長期壓力下仍需要更多支持。",
+      "high": "你展現出良好的復原能力，即使面對困難，也有機會逐步調整並重新站穩。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Connor-Davidson Resilience Scale",
+    "icon": "shield.lefthalf.fill"
+  },
+  {
+    "code": "PANSI14",
+    "title": "PANSI 正負向自殺意念量表",
+    "count": 14,
+    "instructions": "請依實際狀況作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "pansi_1",
+        "text": "因無法達成他人期望而想自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_2",
+        "text": "覺得生活大部分事情可掌控",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_3",
+        "text": "對未來感到無望而想到自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_4",
+        "text": "因人際關係不好希望死",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_5",
+        "text": "因無法完成重要事情想到自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_6",
+        "text": "因事情發展良好而覺得有希望",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_7",
+        "text": "因無法解決問題想到自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_8",
+        "text": "因工作或學校表現好而高興",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_9",
+        "text": "覺得自己是失敗者而想到自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_10",
+        "text": "覺得自殺是唯一解決方法",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_11",
+        "text": "因孤單或難過想到自殺",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_12",
+        "text": "對自己處理問題能力有信心",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_13",
+        "text": "覺得生存有意義",
+        "isReverse": false
+      },
+      {
+        "id": "pansi_14",
+        "text": "對未來計畫有信心",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "從來沒有",
+        "score": 0
+      },
+      {
+        "label": "很少",
+        "score": 1
+      },
+      {
+        "label": "有時",
+        "score": 2
+      },
+      {
+        "label": "常常",
+        "score": 3
+      },
+      {
+        "label": "經常",
+        "score": 4
+      }
+    ],
+    "ranges": [
+      15,
+      31
+    ],
+    "feedback": {
+      "low": "你的結果顯示，你心中仍保有支持自己活下去的理由與力量。",
+      "medium": "你可能正經歷一些內在拉扯，一方面感到痛苦，一方面仍有牽掛與支持力量。",
+      "high": "你近期可能承受相當程度的心理痛苦，這是一個非常重要、需要被關心的訊號。你不需要獨自承擔這些感受。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Positive and Negative Suicide Ideation",
+    "icon": "exclamationmark.triangle.fill"
+  },
+  {
+    "code": "BSS21",
+    "title": "BSS 自殺意念評估",
+    "count": 21,
+    "instructions": "請依實際狀況作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "bss_1",
+        "text": "求生意願",
+        "isReverse": false
+      },
+      {
+        "id": "bss_2",
+        "text": "求死意願",
+        "isReverse": false
+      },
+      {
+        "id": "bss_3",
+        "text": "求生與求死理由",
+        "isReverse": false
+      },
+      {
+        "id": "bss_4",
+        "text": "自殺慾望",
+        "isReverse": false
+      },
+      {
+        "id": "bss_5",
+        "text": "面臨生命威脅時的態度",
+        "isReverse": false
+      },
+      {
+        "id": "bss_6",
+        "text": "自殺念頭持續時間",
+        "isReverse": false
+      },
+      {
+        "id": "bss_7",
+        "text": "自殺念頭頻率",
+        "isReverse": false
+      },
+      {
+        "id": "bss_8",
+        "text": "對自殺觀念態度",
+        "isReverse": false
+      },
+      {
+        "id": "bss_9",
+        "text": "自殺控制能力",
+        "isReverse": false
+      },
+      {
+        "id": "bss_10",
+        "text": "自殺顧慮",
+        "isReverse": false
+      },
+      {
+        "id": "bss_11",
+        "text": "自殺動機",
+        "isReverse": false
+      },
+      {
+        "id": "bss_12",
+        "text": "自殺計畫",
+        "isReverse": false
+      },
+      {
+        "id": "bss_13",
+        "text": "自殺方法取得",
+        "isReverse": false
+      },
+      {
+        "id": "bss_14",
+        "text": "自殺能力",
+        "isReverse": false
+      },
+      {
+        "id": "bss_15",
+        "text": "自殺嘗試意圖",
+        "isReverse": false
+      },
+      {
+        "id": "bss_16",
+        "text": "自殺準備",
+        "isReverse": false
+      },
+      {
+        "id": "bss_17",
+        "text": "遺書",
+        "isReverse": false
+      },
+      {
+        "id": "bss_18",
+        "text": "自殺事後安排",
+        "isReverse": false
+      },
+      {
+        "id": "bss_19",
+        "text": "隱瞞自殺意圖",
+        "isReverse": false
+      },
+      {
+        "id": "bss_20",
+        "text": "過去自殺企圖",
+        "isReverse": false
+      },
+      {
+        "id": "bss_21",
+        "text": "上次企圖自殺時求死意願",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "無或低",
+        "score": 0
+      },
+      {
+        "label": "中等",
+        "score": 1
+      },
+      {
+        "label": "高",
+        "score": 2
+      }
+    ],
+    "ranges": [
+      5,
+      19
+    ],
+    "feedback": {
+      "low": "目前你較少出現與自我傷害相關的想法。",
+      "medium": "你可能偶爾出現關於生命或自我傷害的想法，這代表你正在面對一些不容易的情緒。",
+      "high": "你可能正承受非常大的痛苦。請記得，尋求專業或可信任的人協助，是一種保護自己、而非失敗的行動。"
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Beck Scale for Suicide Ideation",
+    "icon": "waveform.path.ecg"
+  },
+  {
+    "code": "RFQ8",
+    "title": "RFQ-8 心智化量表",
+    "count": 8,
+    "instructions": "請根據您的實際情況選擇最符合的選項：",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "rfq_1",
+        "text": "我不總是知道我做一件事情背後的原因",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_2",
+        "text": "我在生氣時會說出讓自己後悔的話",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_3",
+        "text": "缺乏安全感時會做出令人厭煩的行為",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_4",
+        "text": "有時不知道自己行為原因",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_5",
+        "text": "他人的想法對我來說是神秘的",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_6",
+        "text": "生氣時會說出欠缺思考的話",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_7",
+        "text": "我總是知道自己內心的感受",
+        "isReverse": false
+      },
+      {
+        "id": "rfq_8",
+        "text": "強烈情緒會阻礙我的思考",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "非常不同意",
+        "score": 0
+      },
+      {
+        "label": "很不同意",
+        "score": 1
+      },
+      {
+        "label": "有點不同意",
+        "score": 2
+      },
+      {
+        "label": "普通",
+        "score": 3
+      },
+      {
+        "label": "有點同意",
+        "score": 4
+      },
+      {
+        "label": "很同意",
+        "score": 5
+      },
+      {
+        "label": "完全同意",
+        "score": 6
+      }
+    ],
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Reflective Functioning Questionnaire-8",
+    "icon": "brain.head.profile"
+  },
+  {
+    "code": "AQ10",
+    "title": "AQ-10 自閉光譜量表",
+    "count": 10,
+    "instructions": "請依實際狀況作答",
+    "reverseIndices": [],
+    "questions": [
+      {
+        "id": "aq_1",
+        "text": "我時常注意到其他人不會留意的小聲音",
+        "isReverse": false
+      },
+      {
+        "id": "aq_2",
+        "text": "當我在閱讀故事時，我覺得很難理解故事人物的想法或動機",
+        "isReverse": false
+      },
+      {
+        "id": "aq_3",
+        "text": "我可以輕易地瞭解別人跟我說話時背後的含義",
+        "isReverse": false
+      },
+      {
+        "id": "aq_4",
+        "text": "我常把注意力放在事物的整體多過於細節上",
+        "isReverse": false
+      },
+      {
+        "id": "aq_5",
+        "text": "我能意識到別人對我所說的話是否感到悶了",
+        "isReverse": false
+      },
+      {
+        "id": "aq_6",
+        "text": "我覺得同時進行多項任務是容易的",
+        "isReverse": false
+      },
+      {
+        "id": "aq_7",
+        "text": "我可以容易地憑別人的表情來理解他人的想法和情感",
+        "isReverse": false
+      },
+      {
+        "id": "aq_8",
+        "text": "如果我在做事時被幹擾了，可以很快地回頭做原先做的事",
+        "isReverse": false
+      },
+      {
+        "id": "aq_9",
+        "text": "我覺得理解別人的情緒對我來說很困難",
+        "isReverse": false
+      },
+      {
+        "id": "aq_10",
+        "text": "我傾向注意事情的細節而不是整體",
+        "isReverse": false
+      }
+    ],
+    "options": [
+      {
+        "label": "完全同意",
+        "score": 1
+      },
+      {
+        "label": "稍微同意",
+        "score": 2
+      },
+      {
+        "label": "稍微不同意",
+        "score": 3
+      },
+      {
+        "label": "完全不同意",
+        "score": 4
+      }
+    ],
+    "ranges": [
+      5,
+      5
+    ],
+    "feedback": {
+      "low": "",
+      "medium": "",
+      "high": ""
+    },
+    "sharedOverviewText": "在接下來的測驗中，我們會使用幾份常見的心理量表。這些量表不是考試，也不是診斷工具，沒有對錯、沒有好壞之分。\n\n它們的目的，是幫助我們更了解你最近一段時間的心理狀態、感受與因應方式，也讓你有一個機會，靜下來覺察自己的內在經驗。\n\n請依照你最真實的感受作答，不需要迎合期待，也不需要擔心結果會被貼標籤。所有回答都只代表當下的狀態，而非你這個人本身。",
+    "sharedClosingText": "最後想提醒你：這些測驗的目的不是貼標籤，而是理解與關懷。\n\n如果你在填寫時發現自己有一些困難的感受，那並不代表你脆弱，而是代表你正在覺察自己。你不需要獨自承擔這些感受，請尋求專業人員的協助。",
+    "subtitle": "Autism Spectrum Quotient-10",
+    "icon": "person.2.fill"
+  }
+]
