@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'media_files_io.dart'
+    if (dart.library.js_interop) 'media_files_web.dart' as files;
 
 import '../storage/account_store.dart';
 
@@ -40,21 +42,7 @@ class LocalMediaStore {
   LocalMediaStore(this.accountId, this.store);
   final String accountId;
   final AccountStore store;
-  Future<Directory> directory() async {
-    final base = await getApplicationDocumentsDirectory();
-    final folder = Directory(
-      '${base.path}/mindecho/${base64Url.encode(utf8.encode(accountId))}',
-    );
-    await folder.create(recursive: true);
-    return folder;
-  }
-
-  Future<String> path(String filename) async {
-    if (filename.contains('/') || filename.contains('\\') || filename == '..') {
-      throw const FormatException('無效的本機檔名');
-    }
-    return '${(await directory()).path}/$filename';
-  }
+  Future<String> path(String filename) => files.mediaPath(accountId, store, filename);
 
   Future<List<LocalItem>> load() async {
     final raw = await store.read('treasure.v1');
@@ -70,13 +58,17 @@ class LocalMediaStore {
   );
   Future<LocalItem> importFile(String source, String kind) async {
     final id = DateTime.now().microsecondsSinceEpoch.toString();
-    final extension = source.contains('.')
+    final file = XFile(source);
+    final extension = !kIsWeb && source.contains('.')
         ? source.split('.').last.replaceAll(RegExp('[^a-zA-Z0-9]'), '')
-        : kind == 'image'
-        ? 'jpg'
-        : 'mp4';
+        : kind == 'image' ? 'jpg' : 'mp4';
     final filename = '$id.$extension';
-    await File(source).copy(await path(filename));
+    final data = await file.readAsBytes();
+    // 瀏覽器資料與其他帳號資料共用儲存配額，首版限制單檔大小。
+    if (kIsWeb && data.length > 2 * 1024 * 1024) {
+      throw const FormatException('網頁版目前支援 2 MB 以下的圖片或影片');
+    }
+    await files.writeMedia(accountId, store, filename, data);
     return LocalItem(
       id: id,
       kind: kind,
@@ -87,19 +79,19 @@ class LocalMediaStore {
     );
   }
 
-  Future<Uint8List?> bytes(String filename) async {
-    final file = File(await path(filename));
-    return await file.exists() ? file.readAsBytes() : null;
-  }
+  Future<Uint8List?> bytes(String filename) =>
+      files.readMedia(accountId, store, filename);
 
-  Future<void> removeFile(String filename) async {
-    final file = File(await path(filename));
-    if (await file.exists()) await file.delete();
-  }
+  Future<void> removeFile(String filename) =>
+      files.deleteMedia(accountId, store, filename);
 
   Future<void> setAvatar(String source) async {
     final name = 'avatar-${DateTime.now().microsecondsSinceEpoch}.jpg';
-    await File(source).copy(await path(name));
+    final data = await XFile(source).readAsBytes();
+    if (kIsWeb && data.length > 2 * 1024 * 1024) {
+      throw const FormatException('網頁版目前支援 2 MB 以下的頭貼');
+    }
+    await files.writeMedia(accountId, store, name, data);
     final old = await store.read('avatar');
     await store.write('avatar', name);
     if (old != null) await removeFile(old);

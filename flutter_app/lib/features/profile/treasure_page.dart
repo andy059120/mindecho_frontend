@@ -1,4 +1,5 @@
-import 'dart:io';
+import '../../core/platform/media_files_io.dart'
+    if (dart.library.js_interop) '../../core/platform/media_files_web.dart' as files;
 
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -105,6 +106,8 @@ class _TreasurePageState extends State<TreasurePage> {
         final item = await widget.store.importFile(file.path, kind);
         await _commit([..._items, item]);
       }
+    } on FormatException catch (error) {
+      if (mounted) setState(() => _error = error.message);
     } catch (_) {
       if (mounted) setState(() => _error = '無法新增檔案，請檢查照片權限與儲存空間');
     } finally {
@@ -451,7 +454,7 @@ class _MediaPreviewState extends State<_MediaPreview> {
     try {
       final path = await widget.store.path(widget.item.filename!);
       if (!mounted) return;
-      final player = VideoPlayerController.file(File(path));
+      final player = files.videoController(path);
       _player = player;
       await player.initialize();
       if (mounted) setState(() {});

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -67,6 +68,17 @@ class _MindEchoAppState extends State<MindEchoApp> {
       title: 'MindEcho',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
+      builder: (context, child) => kIsWeb
+          ? ColoredBox(
+              color: const Color(0xFFF3F0EC),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: child!,
+                ),
+              ),
+            )
+          : child!,
       locale: const Locale.fromSubtags(
         languageCode: 'zh',
         scriptCode: 'Hant',

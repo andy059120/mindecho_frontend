@@ -6,7 +6,7 @@
 
 - Flutter **3.47.8 stable**，Dart **3.13.7**；版本記錄於 `.fvmrc`，套件版本記錄於 `pubspec.lock`。
 - iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-5`**，App 顯示名稱 **MindEcho**。
-- 本階段僅產生 iOS host；Android、Web 尚未建立或驗收。
+- 已建立 iOS 與 Web host；Android 尚未建立。Web 為第一版，驗證範圍見下方。
 
 ## 啟動
 
@@ -143,3 +143,47 @@ fvm flutter build ios --simulator --debug --no-codesign
 視覺回歸包含 320／402／440 寬度、彈出頁面、長內容捲動、導覽提示與鍵盤。模式切換的後端功能、列表摘要與訊息時間等尚未暴露給現有 ViewModel 的資料，本輪不擴充；系統原生 sheet／選單及不同 iOS 版本的字型與動態材質，仍需逐狀態對照，不能視為全 App 逐像素驗收完成。
 
 本輪驗證：`flutter analyze` 通過、33 項測試通過；iPhone 17 Pro Max／iOS 26.5 的正常簽章模擬器建置通過。測試涵蓋介紹頁、資源頁、量表與日記捲動、導覽提示和快速回覆；真實帳號僅登入與讀取，未新增或修改後端內容。
+
+
+## Web 第一版（2026-11-02）
+
+沿用現有歡迎、登入及四分頁功能；桌面瀏覽器採最大 520 px 的置中版面，小螢幕依可用寬度顯示。尚未部署至公開網址。
+
+### 本機啟動（含 API 轉送）
+
+在 `flutter_app/` 執行：
+
+```sh
+fvm flutter build web --release --dart-define=API_BASE_URL=/api
+python3 tool/serve_web.py
+```
+
+瀏覽器開啟 `http://localhost:8080`。停止時按 Ctrl+C。工具只綁定本機介面，僅轉送 `/api/` 至既有 HTTPS 後端，不記錄請求內容或 token，也不略過 TLS 驗證；僅供開發使用。更改 port 時請使用 `--port 8081`，並注意瀏覽器儲存會依來源（含 port）隔離。
+
+### 直接開發／正式建置
+
+後端 CORS 設定完成後，可直接執行：
+
+```sh
+fvm flutter run -d chrome --web-port 8080
+fvm flutter build web --release --dart-define=API_BASE_URL=https://your-server.example/api
+```
+
+正式產物位於 `build/web/`；需以 HTTPS 提供（本機 localhost 可使用 HTTP），不能直接開啟 index.html。新增 Web 平台與建置方式依 [Flutter 官方文件](https://docs.flutter.dev/platform-integration/web/building)。
+
+### 已知限制與保存方式
+
+- 後端實測的 OPTIONS 回應為 `Access-Control-Allow-Origin: ["http://mindechoserver.com", "https://www.mindechoserver.com"]`。瀏覽器需要單一匹配來源；後端應依 allowlist 回傳請求的 Origin，包含開發用 `http://localhost:8080` 與正式網域，並允許 Content-Type、Authorization 和現有 API methods。本機轉送是開發替代方案，不會修改後端。
+- Web session、記住的 email、草稿及收藏使用 flutter_secure_storage 的 WebCrypto 瀏覽器儲存；與 iOS Keychain 分開，清除網站資料後會遺失，不跨裝置同步，也不儲存密碼。需 HTTPS 或 localhost。
+- 圖片、頭貼與影片首版以 base64 保存於帳號儲存，每檔最多 2 MB；總容量仍受瀏覽器配額限制，額滿會顯示儲存失敗。影片可播放格式取決於瀏覽器，媒體匯入及播放仍需人工驗收。
+- 非 iOS 使用既有 Cupertino icon fallback，不呼叫 SF Symbols 原生 channel。
+- 未使用真實帳密提交登入或聊天；登入後的真實後端完整流程仍待測試帳號驗收。現有通知與其他尚未移植功能的限制仍適用。
+
+
+### 第一版驗證結果
+
+- Web release 編譯通過（含 Wasm dry run）；`flutter analyze` 通過。
+- 既有 33 項 VM 測試通過；新增 Web 媒體 adapter 保存／刪除測試通過。
+- Chrome 歡迎、註冊欄位、忘記密碼、三種手機寬度，以及 Mock 登入 → 聊天 → 登出共 7 項通過。
+- Chrome 的既有隱私政策自動化測試失敗；實際本機瀏覽器已確認政策能載入並顯示內容，自動化失敗原因仍待定位，不能宣稱 Chrome 全測試通過。
+- 本機首頁 HTTP 200，已實際檢查歡迎及政策畫面；未登入真實帳號、未寫入後端資料。
