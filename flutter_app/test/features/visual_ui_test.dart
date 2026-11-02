@@ -174,6 +174,11 @@ void main() {
           .text,
       '我不知道從哪說起',
     );
+    final draft = '字' * 100 + '👨‍👩‍👧‍👦';
+    await tester.enterText(find.byType(CupertinoTextField), draft);
+    await tester.pumpAndSettle();
+    expect(find.text('101'), findsOneWidget);
+    expect(writes, 0);
     tester.view.viewInsets = const FakeViewPadding(bottom: 280);
     addTearDown(tester.view.resetViewInsets);
     await tester.pumpAndSettle();

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
 import '../../shared/system_symbol.dart';
+import '../../shared/swift_menu_button.dart';
 import 'models.dart';
 
 const headingStyle = TextStyle(
@@ -17,22 +18,24 @@ class MindCard extends StatelessWidget {
     required this.child,
     this.padding = 16,
     this.color = CupertinoColors.white,
+    this.chartStyle = false,
     super.key,
   });
   final Widget child;
   final double padding;
   final Color color;
+  final bool chartStyle;
   @override
   Widget build(BuildContext context) => Container(
     padding: EdgeInsets.all(padding),
     decoration: BoxDecoration(
       color: color,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: const [
+      borderRadius: BorderRadius.circular(chartStyle ? 12 : 16),
+      boxShadow: [
         BoxShadow(
           color: Color(0x19000000),
-          blurRadius: 8,
-          offset: Offset(0, 2),
+          blurRadius: chartStyle ? 4 : 8,
+          offset: chartStyle ? Offset.zero : const Offset(0, 2),
         ),
       ],
     ),
@@ -146,6 +149,8 @@ class TrendChart extends StatefulWidget {
     this.height = 200,
     this.emptySubtitle = '完成每日檢測後查看趨勢',
     this.referenceValue,
+    this.framed = false,
+    this.emphasizeSeries = false,
     super.key,
   });
   final List<TrendSeries> series;
@@ -153,6 +158,7 @@ class TrendChart extends StatefulWidget {
   final double maximum, minimum, height;
   final String? emptySubtitle;
   final double? referenceValue;
+  final bool framed, emphasizeSeries;
   @override
   State<TrendChart> createState() => _TrendChartState();
 }
@@ -162,77 +168,100 @@ class _TrendChartState extends State<TrendChart> {
   @override
   Widget build(BuildContext context) => Column(
     children: [
-      LayoutBuilder(
-        builder: (context, constraints) => GestureDetector(
-          onTapDown: (details) => setState(
-            () => _selected =
-                ((details.localPosition.dx - 32) /
-                        math.max(1, constraints.maxWidth - 57) *
-                        math.max(1, widget.labels.length - 1))
-                    .round()
-                    .clamp(0, math.max(0, widget.labels.length - 1)),
-          ),
-          child: SizedBox(
-            height: widget.height,
-            width: double.infinity,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CustomPaint(
-                  size: Size(constraints.maxWidth, widget.height),
-                  painter: _TrendPainter(
-                    widget.series,
-                    widget.maximum,
-                    widget.minimum,
-                    _selected,
-                    widget.referenceValue,
-                  ),
+      Container(
+        padding: widget.framed ? const EdgeInsets.all(8) : EdgeInsets.zero,
+        decoration: widget.framed
+            ? BoxDecoration(
+                color: CupertinoColors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: AppColors.lightBrown.withValues(alpha: .4),
                 ),
-                if (!widget.series.any((s) => s.values.any((v) => v != null)))
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SystemSymbol(
-                        'chart.line.uptrend.xyaxis',
-                        size: 40,
-                        color: AppColors.title.withValues(alpha: .3),
-                        fallback: CupertinoIcons.chart_bar,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '暫無數據',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.title.withValues(alpha: .6),
+              )
+            : null,
+        child: LayoutBuilder(
+          builder: (context, constraints) => GestureDetector(
+            onTapDown: (details) => setState(
+              () => _selected =
+                  ((details.localPosition.dx - 32) /
+                          math.max(1, constraints.maxWidth - 57) *
+                          math.max(1, widget.labels.length - 1))
+                      .round()
+                      .clamp(0, math.max(0, widget.labels.length - 1)),
+            ),
+            child: SizedBox(
+              height: widget.height,
+              width: double.infinity,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CustomPaint(
+                    size: Size(constraints.maxWidth, widget.height),
+                    painter: _TrendPainter(
+                      widget.series,
+                      widget.maximum,
+                      widget.minimum,
+                      _selected,
+                      widget.referenceValue,
+                      widget.framed,
+                      widget.emphasizeSeries,
+                    ),
+                  ),
+                  if (!widget.series.any((s) => s.values.any((v) => v != null)))
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SystemSymbol(
+                          'chart.line.uptrend.xyaxis',
+                          size: 40,
+                          color: AppColors.title.withValues(alpha: .3),
+                          fallback: CupertinoIcons.chart_bar,
                         ),
-                      ),
-                      if (widget.emptySubtitle != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Text(
-                          widget.emptySubtitle!,
+                          '暫無數據',
                           style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.title.withValues(alpha: .5),
+                            fontSize: 12,
+                            color: AppColors.title.withValues(alpha: .6),
                           ),
                         ),
+                        if (widget.emptySubtitle != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.emptySubtitle!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.title.withValues(alpha: .5),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-              ],
+                    ),
+                ],
+              ),
             ),
           ),
         ),
       ),
       Padding(
-        padding: const EdgeInsets.only(left: 26, right: 20, top: 4),
+        padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
         child: Row(
           children: [
             for (final label in widget.labels)
               Expanded(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 10, color: AppColors.title),
+                child: SizedBox(
+                  height: 24,
+                  child: Center(
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        height: 1.2,
+                        color: AppColors.title,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -243,7 +272,11 @@ class _TrendChartState extends State<TrendChart> {
           padding: const EdgeInsets.only(top: 8),
           child: Text(
             '${widget.labels[_selected!]}  ${widget.series.map((s) => '${s.label}：${_selected! < s.values.length ? s.values[_selected!]?.toStringAsFixed(1) ?? '—' : '—'}').join('  ')}',
-            style: const TextStyle(fontSize: 11, color: AppColors.title),
+            style: TextStyle(
+              fontSize: 11,
+              height: 1.2,
+              color: AppColors.title.withValues(alpha: .6),
+            ),
           ),
         ),
     ],
@@ -257,40 +290,53 @@ class _TrendPainter extends CustomPainter {
     this.minimum,
     this.selected,
     this.referenceValue,
+    this.framed,
+    this.emphasizeSeries,
   );
   final List<TrendSeries> series;
   final double maximum, minimum;
   final double? referenceValue;
   final int? selected;
+  final bool framed, emphasizeSeries;
   @override
   void paint(Canvas canvas, Size size) {
     const left = 32.0, right = 25.0;
+    final top = framed ? 14.0 : 0.0;
+    final bottom = framed ? 2.0 : 0.0;
+    final plotHeight = size.height - top - bottom;
+    double yFor(double value) =>
+        top + plotHeight * (1 - (value - minimum) / (maximum - minimum));
     for (var i = 0; i < 5; i++) {
       final value = maximum - i * (maximum ~/ 4);
-      final y =
-          8 +
-          (size.height - 16) * (1 - (value - minimum) / (maximum - minimum));
+      final y = yFor(value);
       canvas.drawLine(
         Offset(left, y),
         Offset(size.width - right, y),
         Paint()
-          ..color = const Color(0x18000000)
+          ..color = const Color(0x1A808080)
           ..strokeWidth = .5,
       );
       final painter = TextPainter(
         text: TextSpan(
           text: value % 1 == 0 ? '${value.toInt()}' : value.toStringAsFixed(1),
-          style: const TextStyle(fontSize: 11, color: AppColors.title),
+          style: TextStyle(
+            fontSize: 11,
+            height: 1.2,
+            color: AppColors.title.withValues(alpha: .6),
+          ),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      painter.paint(canvas, Offset(4, y - painter.height / 2));
+      painter.paint(
+        canvas,
+        Offset(
+          (left - painter.width) / 2,
+          (y - painter.height / 2).clamp(0, size.height - painter.height),
+        ),
+      );
     }
     if (referenceValue != null) {
-      final y =
-          8 +
-          (size.height - 16) *
-              (1 - (referenceValue! - minimum) / (maximum - minimum));
+      final y = yFor(referenceValue!);
       for (double x = left; x < size.width - right; x += 10) {
         canvas.drawLine(
           Offset(x, y),
@@ -315,9 +361,7 @@ class _TrendPainter extends CustomPainter {
               (size.width - left - right) *
                   i /
                   math.max(1, s.values.length - 1),
-          8 +
-              (size.height - 16) *
-                  (1 - (value - minimum) / (maximum - minimum)),
+          yFor(value),
         );
         if (connected) {
           path.lineTo(point.dx, point.dy);
@@ -327,16 +371,49 @@ class _TrendPainter extends CustomPainter {
         connected = true;
         canvas.drawCircle(
           point,
-          selected == i ? 5 : 3,
+          selected == i
+              ? 5
+              : emphasizeSeries
+              ? 2.5
+              : 2,
           Paint()..color = s.color,
         );
+      }
+      if (emphasizeSeries) {
+        for (var i = 0; i < s.values.length; i++) {
+          final value = s.values[i];
+          if (value == null) continue;
+          final label = TextPainter(
+            text: TextSpan(
+              text: value % 1 == 0
+                  ? '${value.toInt()}'
+                  : value.toStringAsFixed(1),
+              style: TextStyle(fontSize: 11, height: 1.2, color: s.color),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          final x =
+              left +
+              (size.width - left - right) *
+                  i /
+                  math.max(1, s.values.length - 1);
+          label.paint(
+            canvas,
+            Offset(
+              x - label.width / 2,
+              math.max(0, yFor(value) - 12 - label.height / 2),
+            ),
+          );
+        }
       }
       canvas.drawPath(
         path,
         Paint()
           ..color = s.color
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2,
+          ..strokeWidth = emphasizeSeries ? 3 : 2
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round,
       );
     }
   }
@@ -406,31 +483,42 @@ class _IndicatorCardState extends State<IndicatorCard> {
         .toList();
     final starts = trendStarts(_period, DateTime.now());
     return MindCard(
+      chartStyle: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Expanded(child: Text('五項指標追蹤', style: headingStyle)),
-              textAction('$_indicator ☰', () async {
-                final value = await choose(context, '選擇指標', [
-                  '全部',
-                  ...indicators.map((e) => e.label),
-                ]);
-                if (value != null && mounted) {
-                  setState(() => _indicator = value);
-                }
-              }, color: AppColors.title),
+              Expanded(
+                child: Text(
+                  '五項指標追蹤',
+                  style: headingStyle.copyWith(
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+              SwiftMenuButton(
+                label: _indicator,
+                dividerAfterFirst: true,
+                symbol: 'line.3.horizontal.decrease',
+                accessibilityLabel: '選擇指標',
+                options: ['顯示全部', ...indicators.map((e) => e.label)],
+                onSelected: (value) {
+                  if (mounted) {
+                    setState(() => _indicator = value == '顯示全部' ? '全部' : value);
+                  }
+                },
+              ),
               const SizedBox(width: 12),
-              textAction('$_period ⌄', () async {
-                final value = await choose(context, '時間週期', [
-                  '本週',
-                  '最近七週',
-                  '最近七月',
-                  '最近三年半',
-                ]);
-                if (value != null && mounted) setState(() => _period = value);
-              }, color: AppColors.title),
+              SwiftMenuButton(
+                label: _period,
+                accessibilityLabel: '時間週期',
+                options: ['本週', '最近七週', '最近七月', '最近三年半'],
+                onSelected: (value) {
+                  if (mounted) setState(() => _period = value);
+                },
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -451,21 +539,47 @@ class _IndicatorCardState extends State<IndicatorCard> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Text(s.label, style: const TextStyle(fontSize: 12)),
+                    Text(
+                      s.label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        height: 1.2,
+                        color: AppColors.title.withValues(alpha: .8),
+                      ),
+                    ),
                   ],
                 ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            'ⓘ 右上角的「全部」可切換成單一指標檢視',
-            style: TextStyle(
-              fontSize: 11,
-              color: AppColors.title.withValues(alpha: .55),
-            ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              SystemSymbol(
+                'info.circle',
+                size: 11,
+                color: AppColors.title.withValues(alpha: .55),
+                fallback: CupertinoIcons.info_circle,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  _indicator == '全部'
+                      ? '右上角的「全部」可切換成單一指標檢視'
+                      : '可從右上角切換回全部或改看其他指標',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    height: 1.2,
+                    color: AppColors.title.withValues(alpha: .55),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           TrendChart(
+            emphasizeSeries: _indicator != '全部',
             minimum: 1,
             series: shown,
             labels: starts
@@ -517,11 +631,20 @@ class _ScoresCardState extends State<ScoresCard> {
             .toList()
           ..sort((a, b) => b.date.compareTo(a.date));
     return MindCard(
+      chartStyle: true,
       child: Column(
         children: [
           Row(
             children: [
-              const Expanded(child: Text('每日檢測紀錄', style: headingStyle)),
+              Expanded(
+                child: Text(
+                  '每日檢測紀錄',
+                  style: headingStyle.copyWith(
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                  ),
+                ),
+              ),
               if (widget.records.isNotEmpty)
                 textAction(
                   '查看全部',
@@ -554,16 +677,15 @@ class _ScoresCardState extends State<ScoresCard> {
             children: [
               const Text('平均區間', style: TextStyle(fontSize: 12)),
               const Spacer(),
-              textAction('$_period ⌄', () async {
-                final value = await choose(context, '平均區間', [
-                  '這週',
-                  '這月',
-                  '這季',
-                  '這半年',
-                  '這年',
-                ]);
-                if (value != null && mounted) setState(() => _period = value);
-              }, color: AppColors.title),
+              SwiftMenuButton(
+                label: _period,
+                filled: true,
+                accessibilityLabel: '平均區間',
+                options: ['這週', '這月', '這季', '這半年', '這年'],
+                onSelected: (value) {
+                  if (mounted) setState(() => _period = value);
+                },
+              ),
             ],
           ),
           if (filtered.isEmpty)

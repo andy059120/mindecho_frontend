@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import '../../app/theme.dart';
 import '../../core/storage/account_store.dart';
 import '../../shared/widgets.dart';
+import '../../shared/swift_menu_button.dart';
 import '../../shared/swift_segmented_control.dart';
 import '../diary/diary_page.dart';
 import '../scales/scale_introductions.dart';
@@ -256,8 +257,8 @@ class _ScaleTrackingState extends State<ScaleTracking> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.lightYellow,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: Color(0x19000000), blurRadius: 8)],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [BoxShadow(color: Color(0x19000000), blurRadius: 4)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -265,13 +266,18 @@ class _ScaleTrackingState extends State<ScaleTracking> {
           Row(
             children: [
               const Expanded(child: Text('量表追蹤', style: headingStyle)),
-              textAction('$_code ⌄', () async {
-                final value = await choose(context, '選擇量表', [
+              SwiftMenuButton(
+                label: _code,
+                dividerAfterFirst: true,
+                accessibilityLabel: '選擇量表',
+                options: [
                   '全部',
                   ...widget.records.map((e) => e['code'] as String),
-                ]);
-                if (value != null && mounted) setState(() => _code = value);
-              }, color: AppColors.title),
+                ],
+                onSelected: (value) {
+                  if (mounted) setState(() => _code = value);
+                },
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -308,23 +314,14 @@ class _ScaleTrackingState extends State<ScaleTracking> {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: CupertinoColors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.lightBrown.withValues(alpha: .4),
-              ),
-            ),
-            child: TrendChart(
-              height: 230,
-              series: series,
-              maximum: chartMax,
-              referenceValue: reference,
-              emptySubtitle: null,
-              labels: List.generate(5, (i) => '第${i + 1}次'),
-            ),
+          TrendChart(
+            framed: true,
+            height: 230,
+            series: series,
+            maximum: chartMax,
+            referenceValue: reference,
+            emptySubtitle: null,
+            labels: List.generate(5, (i) => '第${i + 1}次'),
           ),
           const SizedBox(height: 12),
           for (final scale in widget.records)

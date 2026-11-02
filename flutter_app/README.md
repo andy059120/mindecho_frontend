@@ -187,3 +187,27 @@ fvm flutter build web --release --dart-define=API_BASE_URL=https://your-server.e
 - Chrome 歡迎、註冊欄位、忘記密碼、三種手機寬度，以及 Mock 登入 → 聊天 → 登出共 7 項通過。
 - Chrome 的既有隱私政策自動化測試失敗；實際本機瀏覽器已確認政策能載入並顯示內容，自動化失敗原因仍待定位，不能宣稱 Chrome 全測試通過。
 - 本機首頁 HTTP 200，已實際檢查歡迎及政策畫面；未登入真實帳號、未寫入後端資料。
+
+## 視覺細節補充（2026-11-02）
+
+- 圖表的指標、時間週期、平均區間及量表篩選，改為靠近觸發按鈕的浮動選單；對齊原版圓角、項目間距、分組分隔與淡入動畫，保留取消不變更原值。
+- 日記月曆改用 SF Symbols 月份箭頭，加入月份／年份選擇、月份切換動畫、今日字重與選取狀態。瀏覽月份不會寫入或更改日記。
+- 個人資訊改為原版頭像卡片、圖示欄位與編輯入口，並對齊白色導覽背景、圓形返回按鈕及內容高度。頭貼沿用既有讀寫方法。
+- 編輯個人資訊改為原生風格的分組表單，調整列高、圓角、背景及保存按鈕；出生年月仍為顯示欄位，本輪不擴充更新資料。
+- 新增 7 項測試，涵蓋 320／402／440 寬度、長選單、取消、個人資訊、鍵盤與跨月份／閏年月曆；目前完整 41 項測試與靜態檢查通過。
+- API、資料層、認證及本機儲存實作維持本輪開始時的內容。原 Swift 與其他既有 Web 工作保留。
+
+## 首頁、追蹤與聊天細修／iOS 17.6 檢查（2026-11-02）
+
+- 首頁與追蹤圖表：依 Swift 原始碼對齊繪圖區留白、座標與日期標籤、格線、圓角及陰影；單一指標使用較粗折線與數值標示，切換後同步更新提示。量表日期標籤移至圖框外。
+- 聊天：對齊訊息泡泡可用寬度、文字行高、輸入列背景與傳送中提示位置；超過 100 個字元顯示字數，以 grapheme cluster 計算 emoji。訊息時間仍待後續資料層規劃，本輪不補造時間或修改 API model。
+- UI 使用現有 Flutter 繪製與 Cupertino 元件，沒有新增要求 iOS 18／26 的原生 API。SF Symbols 在較舊系統找不到圖示時會沿用現有 Cupertino icon fallback。
+
+### 最低支援版本的證據與限制
+
+- Runner 的 Debug／Profile／Release deployment target、AppFrameworkInfo.plist 與產生的 Swift Package platform 均設定為 **17.6**，沒有降低到 17.5，也沒有提高最低需求。
+- 已檢查鎖定版本的原生套件 manifest：secure storage／URL launcher 最低 iOS 13，image picker／video player 最低 iOS 15；沒有套件要求高於 17.6。
+- `flutter build ios --debug --no-codesign --no-pub` 通過。實機產物 Info.plist 的 MinimumOSVersion 與 Runner／Runner.debug.dylib 的 Mach-O minos 為 **17.6**；內嵌 Flutter、App、objective_c framework 的 minos 為 **15.0**，沒有把 App 的最低需求拉高。這份未簽署產物只用於編譯與版本檢查，沒有安裝到實機。
+- 本機已安裝的 runtime 為 iOS 17.0、17.5、26.5，沒有 17.6；此次畫面驗收在 **iOS 26.5**，**不代表 iOS 17.6 實機驗收完成**。發布前仍須用 17.6 裝置驗證啟動、登入／Keychain、鍵盤、相片及影片流程。
+- Flutter 系統支援範圍可參考 [官方支援平台文件](https://docs.flutter.dev/reference/supported-platforms)；本專案仍固定 Flutter 3.47.8，實際可部署性以鎖定 SDK、套件及產物檢查為準。
+- 新增窄螢幕圖表切換測試，並補充含 emoji 的長訊息字數與鍵盤測試；完整 42 項測試通過。API、認證、資料 model 與儲存實作未修改。

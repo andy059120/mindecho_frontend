@@ -177,116 +177,201 @@ class CalendarMonth extends StatefulWidget {
 
 class _CalendarMonthState extends State<CalendarMonth> {
   late DateTime _month = DateTime(widget.selected.year, widget.selected.month);
+  bool _showMonthPicker = false;
   @override
   void didUpdateWidget(CalendarMonth old) {
     super.didUpdateWidget(old);
     if (old.selected != widget.selected) {
       _month = DateTime(widget.selected.year, widget.selected.month);
+      _showMonthPicker = false;
     }
   }
 
+  void _move(int delta) =>
+      setState(() => _month = DateTime(_month.year, _month.month + delta));
+  Widget _arrow(String name, String label, int delta) => Semantics(
+    label: label,
+    button: true,
+    excludeSemantics: true,
+    onTap: () => _move(delta),
+    child: CupertinoButton(
+      padding: const EdgeInsets.all(8),
+      minimumSize: const Size(32, 32),
+      onPressed: () => _move(delta),
+      child: SystemSymbol(
+        name,
+        size: 17,
+        weight: 'semibold',
+        color: AppColors.title,
+        fallback: delta < 0
+            ? CupertinoIcons.chevron_left
+            : CupertinoIcons.chevron_right,
+      ),
+    ),
+  );
   @override
   Widget build(BuildContext context) {
-    final first = DateTime(_month.year, _month.month);
-    final count = DateTime(_month.year, _month.month + 1, 0).day;
-    final offset = first.weekday % 7;
-    final weeks = ((offset + count) / 7).ceil();
+    final first = DateTime(_month.year, _month.month),
+        count = DateTime(_month.year, _month.month + 1, 0).day;
+    final offset = first.weekday % 7, weeks = ((offset + count) / 7).ceil();
+    final today = calendarDay(DateTime.now());
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(
-                '${_month.year}年${_month.month}月',
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  onPressed: () =>
+                      setState(() => _showMonthPicker = !_showMonthPicker),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${_month.year}年${_month.month}月',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.title,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      AnimatedRotation(
+                        duration: const Duration(milliseconds: 200),
+                        turns: _showMonthPicker ? .25 : 0,
+                        child: const SystemSymbol(
+                          'chevron.right',
+                          size: 12,
+                          weight: 'semibold',
+                          color: AppColors.title,
+                          fallback: CupertinoIcons.chevron_right,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            textAction(
-              '‹',
-              color: AppColors.title,
-              () => setState(
-                () => _month = DateTime(_month.year, _month.month - 1),
-              ),
-              size: 28,
-            ),
-            const SizedBox(width: 20),
-            textAction(
-              '›',
-              color: AppColors.title,
-              () => setState(
-                () => _month = DateTime(_month.year, _month.month + 1),
-              ),
-              size: 28,
-            ),
+            _arrow('chevron.left', '上一個月', -1),
+            const SizedBox(width: 12),
+            _arrow('chevron.right', '下一個月', 1),
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            for (final day in ['日', '一', '二', '三', '四', '五', '六'])
-              Expanded(
-                child: Text(
-                  day,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: CupertinoColors.secondaryLabel,
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: _showMonthPicker
+              ? SizedBox(
+                  height: weeks * 44.0 + 28,
+                  child: CupertinoTheme(
+                    data: CupertinoTheme.of(context).copyWith(
+                      textTheme: CupertinoTheme.of(context).textTheme.copyWith(
+                        dateTimePickerTextStyle: const TextStyle(
+                          fontSize: 21,
+                          color: AppColors.title,
+                        ),
+                      ),
+                    ),
+                    child: CupertinoDatePicker(
+                      mode: CupertinoDatePickerMode.monthYear,
+                      initialDateTime: _month,
+                      backgroundColor: const Color(0xFFFBF6F0),
+                      onDateTimeChanged: (date) => setState(
+                        () => _month = DateTime(date.year, date.month),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-          ],
-        ),
-        for (var week = 0; week < weeks; week++)
-          Row(
-            children: [
-              for (var col = 0; col < 7; col++)
-                Expanded(
-                  child: Builder(
-                    builder: (context) {
-                      final day = week * 7 + col - offset + 1;
-                      if (day < 1 || day > count) {
-                        return const SizedBox(height: 44);
-                      }
-                      final date = DateTime(_month.year, _month.month, day);
-                      final active = date == calendarDay(widget.selected);
-                      final recorded = widget.entries.any(
-                        (e) => calendarDay(e.date) == date,
-                      );
-                      return CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(0, 44),
-                        onPressed: () => widget.onSelected(date),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: active
-                                ? AppColors.title
-                                : recorded
-                                ? AppColors.orange.withValues(alpha: .12)
-                                : null,
-                          ),
-                          child: Text(
-                            '$day',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: active
-                                  ? CupertinoColors.white
-                                  : AppColors.title,
+                )
+              : Column(
+                  children: [
+                    Row(
+                      children: [
+                        for (final day in ['日', '一', '二', '三', '四', '五', '六'])
+                          Expanded(
+                            child: Text(
+                              day,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: CupertinoColors.secondaryLabel,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    for (var week = 0; week < weeks; week++)
+                      Row(
+                        children: [
+                          for (var col = 0; col < 7; col++)
+                            Expanded(
+                              child: Builder(
+                                builder: (context) {
+                                  final day = week * 7 + col - offset + 1;
+                                  if (day < 1 || day > count) {
+                                    return const SizedBox(height: 44);
+                                  }
+                                  final date = DateTime(
+                                        _month.year,
+                                        _month.month,
+                                        day,
+                                      ),
+                                      active =
+                                          calendarDay(widget.selected) ==
+                                          DateTime(
+                                            _month.year,
+                                            _month.month,
+                                            day,
+                                          );
+                                  return Semantics(
+                                    selected: active,
+                                    child: CupertinoButton(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 44),
+                                      onPressed: () => widget.onSelected(date),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 160,
+                                        ),
+                                        width: 36,
+                                        height: 36,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: active
+                                              ? AppColors.title
+                                              : null,
+                                        ),
+                                        child: Text(
+                                          '$day',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            height: 1.2,
+                                            fontWeight: date == today
+                                                ? FontWeight.w600
+                                                : FontWeight.normal,
+                                            color: active
+                                                ? CupertinoColors.white
+                                                : AppColors.title,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                        ],
+                      ),
+                  ],
                 ),
-            ],
-          ),
+        ),
       ],
     );
   }

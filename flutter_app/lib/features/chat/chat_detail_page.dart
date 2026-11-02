@@ -345,11 +345,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                       ),
                     ),
                   ..._messages.map(_bubble),
-                  if (_sending)
-                    const Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Text('訊息傳送中，請稍候...'),
-                    ),
                   if (_error != null)
                     ErrorNotice(_error!, onRetry: _sending ? null : _load),
                   if (_ended)
@@ -443,10 +438,30 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   )
                 : const SizedBox.shrink(),
           ),
+          if (_sending)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              color: AppColors.chatBackground,
+              child: Row(
+                children: [
+                  CupertinoActivityIndicator(color: widget.session.mode.color),
+                  const SizedBox(width: 8),
+                  Text(
+                    '訊息傳送中，請稍候...',
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.2,
+                      color: widget.session.mode.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: const BoxDecoration(
-              color: Color(0xCCFFFFFF),
+              color: AppColors.chatBackground,
               border: Border(
                 top: BorderSide(color: Color(0x4D8E8E93), width: .5),
               ),
@@ -477,6 +492,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     builder: (context, value, _) => CupertinoTextField(
                       controller: _text,
                       placeholder: widget.session.mode.placeholder,
+                      placeholderStyle: const TextStyle(
+                        fontSize: 17,
+                        height: 1.2,
+                        color: CupertinoColors.placeholderText,
+                      ),
+                      suffix: value.text.characters.length > 100
+                          ? Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: Text(
+                                '${value.text.characters.length}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  height: 1.2,
+                                  color: CupertinoColors.systemGrey,
+                                ),
+                              ),
+                            )
+                          : null,
                       minLines: 1,
                       maxLines: 4,
                       enabled:
@@ -487,6 +520,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                           !_ended,
                       style: const TextStyle(
                         fontSize: 17,
+                        height: 1.2,
                         color: CupertinoColors.label,
                       ),
                       padding: const EdgeInsets.symmetric(
@@ -577,8 +611,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           child: Container(
             constraints: BoxConstraints(
               maxWidth:
-                  MediaQuery.sizeOf(context).width * .78 -
-                  (message.isFromUser ? 0 : 48),
+                  MediaQuery.sizeOf(context).width -
+                  (message.isFromUser ? 40 : 88),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -596,7 +630,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               message.content,
               style: TextStyle(
                 fontSize: 15,
-                height: 1.3,
+                height: 1.2,
                 color: message.isFromUser
                     ? CupertinoColors.white
                     : AppColors.title,
