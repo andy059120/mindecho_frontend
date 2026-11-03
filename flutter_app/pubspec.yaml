@@ -1,7 +1,8 @@
 name: mindecho_flutter
 description: MindEcho 的 Flutter iOS、Android 與 Web 前端。
 publish_to: none
-version: 1.6.0+1
+# iOS 的顯示版本由 Xcode MARKETING_VERSION 設定；+ 後為 Build number。
+version: 1.6.0+11
 
 environment:
   sdk: '>=3.13.7 <4.0.0'

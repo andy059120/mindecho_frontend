@@ -1,11 +1,11 @@
-# MindEcho Flutter
+# PsychEcho Flutter
 
 同一個 repository 中的 Flutter iOS、Android 與 Web 前端。Swift 專案保留於上層 `mindecho/`，供功能與畫面對照。
 
 ## 固定環境
 
 - Flutter **3.47.8 stable**，Dart **3.13.7**；版本記錄於 `.fvmrc`，套件版本記錄於 `pubspec.lock`。
-- iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-5`**，App 顯示名稱 **MindEcho**。
+- iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-2`**，App 顯示名稱 **PsychEcho**。
 - 已建立 iOS、Android 與 Web host。Android 第一階段設定、啟動及驗收方式見 [ANDROID.md](ANDROID.md)；Web 為第一版，驗證範圍見下方。
 
 ## 啟動
@@ -18,7 +18,7 @@ fvm flutter pub get
 fvm flutter run
 ```
 
-實機執行請開啟 `ios/Runner.xcworkspace`，在 Runner 的 Signing & Capabilities 選擇自己的開發團隊，並確認該團隊可使用 `com.mindecho-5`。專案未固定個人開發團隊。
+實機執行請開啟 `ios/Runner.xcworkspace`，在 Runner 的 Signing & Capabilities 選擇自己的開發團隊，並確認該團隊可使用 `com.mindecho-2`。專案未固定個人開發團隊。
 
 預設重用 Swift 的 `https://mindechoserver.com:8443/api`。需要切換環境時：
 
@@ -68,7 +68,7 @@ UI 還原以 Swift 程式與同尺寸模擬器畫面為依據。未登入時先�
 
 HealthKit 程式及設定繼續保留於 Swift，Flutter 本階段不接入，也不新增健康權限。
 
-`com.mindecho-5` 與 Swift App 的 `com.mindecho-2` 各自使用獨立的 App sandbox；Swift 本機 session、草稿與收藏不會自動帶入。後端既有資料則透過相同帳號與 API 存取。
+Flutter iOS 與原 Swift App 共用 Bundle ID `com.mindecho-2`，用於接續既有 App Store Connect／TestFlight App。相同開發團隊簽署下會作為同一個 App 更新；兩套實作的本機 session、草稿與收藏格式不同，目前未實作資料遷移，不能保證可直接讀取 Swift 的本機資料。後端既有資料仍透過相同帳號與 API 存取。
 
 ## 資料夾
 
