@@ -55,7 +55,7 @@ class _MindEchoAppState extends State<MindEchoApp> {
       }
     } catch (error) {
       debugPrint(
-        'MindEcho 啟動失敗：${error.runtimeType}'
+        'PsychEcho 啟動失敗：${error.runtimeType}'
         '${error is PlatformException ? ' (${error.code})' : ''}',
       );
       if (mounted) setState(() => _error = '無法載入應用程式資料，請重新嘗試');
@@ -68,7 +68,7 @@ class _MindEchoAppState extends State<MindEchoApp> {
     builder: (context, _) => CupertinoApp(
       // 登出後重建 Navigator，同時移除已推入的聊天室與敏感畫面。
       key: ValueKey(widget.auth.session == null ? 'guest' : 'authenticated'),
-      title: 'MindEcho',
+      title: 'PsychEcho',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       builder: (context, child) => kIsWeb

@@ -26,7 +26,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
   @override
   Widget build(BuildContext context) => CupertinoPageScaffold(
     navigationBar: CupertinoNavigationBar(
-      middle: const Text('隱私權保護政策與使用聲明'),
+      middle: const Text('隱私政策與聲明'),
       trailing: CupertinoButton(
         padding: EdgeInsets.zero,
         onPressed: () => Navigator.pop(context),
@@ -63,7 +63,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'MindEcho',
+                          'PsychEcho',
                           style: TextStyle(
                             height: 1.2,
                             fontSize: 13,

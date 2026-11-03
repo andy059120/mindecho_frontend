@@ -29,7 +29,7 @@ class AuthBrand extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'MindEcho',
+          'PsychEcho',
           style: TextStyle(
             fontSize: size,
             fontFamily: 'CupertinoSystemDisplay',

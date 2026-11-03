@@ -279,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   const SizedBox(height: 24),
                                   Text(
-                                    '登入即表示您已閱讀並同意 MindEcho 隱私權保護政策與使用聲明。',
+                                    '登入即表示您已閱讀並同意 PsychEcho 隱私權保護政策與使用聲明。',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 12,

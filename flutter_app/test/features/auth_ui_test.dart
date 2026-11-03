@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -15,6 +18,18 @@ Future<AuthController> startApp(
   Size size = const Size(440, 956),
   double scale = 1,
 }) async {
+  const policyPath = 'assets/data/privacy_policy.json';
+  final policyBytes = await tester.runAsync(
+    () => File(policyPath).readAsBytes(),
+  );
+  rootBundle.evict(policyPath);
+  tester.binding.defaultBinaryMessenger.setMockMessageHandler(
+    'flutter/assets',
+    (message) async {
+      final path = const StringCodec().decodeMessage(message);
+      return path == policyPath ? ByteData.sublistView(policyBytes!) : null;
+    },
+  );
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -82,6 +97,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('個人信息'), findsOneWidget);
     expect(find.text('緊急聯絡人'), findsOneWidget);
+    // 六項聲明各自切換，預設皆未同意，且返回上一步仍保留選擇。
+    Finder consent(int i) => find.byKey(ValueKey('privacy-consent-$i'));
+    bool checked(int i) => tester
+        .widget<Semantics>(
+          find.ancestor(of: consent(i), matching: find.byType(Semantics)).first,
+        )
+        .properties
+        .checked!;
+    for (var i = 0; i < 6; i++) {
+      await tester.ensureVisible(consent(i));
+      expect(checked(i), isFalse);
+      await tester.tap(consent(i));
+      await tester.pump();
+      expect(checked(i), isTrue);
+    }
+    await tester.ensureVisible(consent(0));
+    await tester.tap(consent(0));
+    await tester.pump();
+    expect(checked(0), isFalse);
+    for (var i = 1; i < 6; i++) {
+      expect(checked(i), isTrue);
+    }
+    final policy = find.text('查看隱私權保護政策與使用聲明');
+    await tester.ensureVisible(policy);
+    await tester.tap(policy);
+    await tester.pumpAndSettle();
+    expect(find.text('隱私政策與聲明'), findsOneWidget);
+    await tester.tap(find.text('完成'));
+    await tester.pumpAndSettle();
+    expect(checked(0), isFalse);
+    expect(checked(5), isTrue);
     final back = find.text('返回上一步');
     await tester.ensureVisible(back);
     await tester.tap(back);
@@ -121,7 +167,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('隱私政策入口可閱讀原版完整內容並關閉', (tester) async {
+  testWidgets('隱私政策入口可閱讀更新後完整內容並關閉', (tester) async {
     await startApp(tester);
     await tester.tap(find.text('隱私政策'));
     await tester.pumpAndSettle();

@@ -283,7 +283,7 @@ const _pages = [
   ),
   _Slide(
     '24/7 隨時陪伴',
-    '無論何時何地，MindEcho 都在這裡傾聽您的心聲，提供即時的情感支持和專業建議',
+    '無論何時何地，PsychEcho 都在這裡傾聽您的心聲，提供即時的情感支持和專業建議',
     'clock.arrow.circlepath',
     AppColors.mediumBrown,
     CupertinoIcons.clock,

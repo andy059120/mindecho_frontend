@@ -9,6 +9,7 @@ import '../../shared/system_symbol.dart';
 import 'auth_controller.dart';
 import 'auth_widgets.dart';
 import 'privacy_page.dart';
+import 'privacy_consent.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({required this.auth, super.key});
@@ -55,7 +56,8 @@ class _RegisterPageState extends State<RegisterPage> {
   int _education = 0;
   DateTime? _birth;
   int _step = 0;
-  bool _agree = false;
+  final _agreements = List<bool>.filled(privacyConsentStatements.length, false);
+  bool get _agree => _agreements.every((accepted) => accepted);
   bool _busy = false;
   String? _error;
   bool get _basicValid =>
@@ -441,59 +443,57 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: AppColors.lightYellow.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  CupertinoButton(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: Size.zero,
-                                    onPressed: () =>
-                                        setState(() => _agree = !_agree),
-                                    child: SystemSymbol(
-                                      _agree
-                                          ? 'checkmark.square.fill'
-                                          : 'square',
-                                      size: 20,
-                                      color: AppColors.orange,
-                                      fallback: _agree
-                                          ? CupertinoIcons.checkmark_square_fill
-                                          : CupertinoIcons.square,
-                                    ),
+                            _label('附錄 A：使用聲明（簡要重點）'),
+                            const SizedBox(height: 8),
+                            const Text('請逐項閱讀並勾選，全部同意後即可建立帳號。'),
+                            CupertinoButton(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              onPressed: () => showPrivacy(context),
+                              child: const Text('查看隱私權保護政策與使用聲明'),
+                            ),
+                            for (
+                              var i = 0;
+                              i < privacyConsentStatements.length;
+                              i++
+                            )
+                              Semantics(
+                                checked: _agreements[i],
+                                child: CupertinoButton(
+                                  key: ValueKey('privacy-consent-$i'),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _label('我已閱讀並同意'),
-                                        const SizedBox(height: 4),
-                                        CupertinoButton(
-                                          padding: EdgeInsets.zero,
-                                          minimumSize: Size.zero,
-                                          onPressed: () => showPrivacy(context),
-                                          child: const Text(
-                                            '服務條款 和 隱私政策',
-                                            style: TextStyle(
-                                              height: 1.2,
-                                              fontSize: 14,
-                                            ),
+                                  onPressed: _busy
+                                      ? null
+                                      : () => setState(() {
+                                          _agreements[i] = !_agreements[i];
+                                        }),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        _agreements[i]
+                                            ? CupertinoIcons
+                                                  .checkmark_square_fill
+                                            : CupertinoIcons.square,
+                                        color: AppColors.orange,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          privacyConsentStatements[i],
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            height: 1.5,
+                                            color: AppColors.mediumBrown,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
                             if (_error != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 24),
