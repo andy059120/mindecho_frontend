@@ -57,7 +57,7 @@ struct AuthConstants {
     
     // MARK: - 成功訊息
     struct SuccessMessages {
-        static let registrationSuccess = "註冊成功！歡迎加入 MindEcho！"
+        static let registrationSuccess = "註冊成功！歡迎加入 PsychEcho！"
         static let loginSuccess = "登入成功！"
         static let logoutSuccess = "已安全登出"
         static let passwordResetSent = "密碼重置連結已發送到您的電子郵件"

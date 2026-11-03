@@ -24,7 +24,11 @@ struct RegisterPage: View {
     @State private var selectedGender: String = ""
     @State private var selectedEducationLevel: Int = 0
     @State private var showDatePicker = false
-    @State private var agreeToTerms = false
+    @State private var acceptedStatements: Set<Int> = []
+    @State private var showPrivacyPolicy = false
+    private var agreeToTerms: Bool {
+        PrivacyPolicyContent.consentStatements.indices.allSatisfy { acceptedStatements.contains($0) }
+    }
     @State private var importantQuote = UserDefaults.standard.string(
         forKey: AuthConstants.UserDefaultsKeys.importantQuote
     ) ?? ""
@@ -86,6 +90,9 @@ struct RegisterPage: View {
                 }
             }
         }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            PrivacyPolicyStatementView()
+        }
         .sheet(isPresented: $showDatePicker) {
             DatePickerSheet(
                 selectedDate: $selectedDate,
@@ -110,7 +117,7 @@ struct RegisterPage: View {
         selectedGender = ""
         selectedEducationLevel = 0
         emergencyContacts = [EmergencyContactInput()]
-        agreeToTerms = false
+        acceptedStatements = []
         importantQuote = ""
         didEditImportantQuote = false
         UserDefaults.standard.removeObject(forKey: AuthConstants.UserDefaultsKeys.importantQuote)
@@ -418,7 +425,7 @@ private extension RegisterPage {
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(AppColors.orange)
                     
-                    Text("MindEcho")
+                    Text("PsychEcho")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(AppColors.darkBrown)
                 }
@@ -801,53 +808,46 @@ private extension RegisterPage {
     
     // 服務條款同意區域
     var termsAgreementSection: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Button(action: {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    agreeToTerms.toggle()
-                }
-            }) {
-                Image(systemName: agreeToTerms ? "checkmark.square.fill" : "square")
-                    .font(.system(size: 20))
-                    .foregroundColor(agreeToTerms ? AppColors.orange : AppColors.mediumBrown.opacity(0.6))
-                    .scaleEffect(agreeToTerms ? 1.1 : 1.0)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("附錄 A：使用聲明（簡要重點）")
+                .font(.system(size: 16, weight: .semibold))
+            Text("請逐項閱讀並勾選，全部同意後即可建立帳號。")
+                .font(.system(size: 14))
+            Button("查看隱私權保護政策與使用聲明") {
+                showPrivacyPolicy = true
             }
-            .buttonStyle(PlainButtonStyle())
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text("我同意 MindEcho 的")
-                    .font(.system(size: 14))
-                    .foregroundColor(AppColors.mediumBrown)
-                
-                HStack(spacing: 4) {
-                    Button("服務條款") {
-                        // TODO: 顯示服務條款
+            .foregroundColor(AppColors.orange)
+            ForEach(PrivacyPolicyContent.consentStatements.indices, id: \.self) { index in
+                Button {
+                    if acceptedStatements.contains(index) {
+                        acceptedStatements.remove(index)
+                    } else {
+                        acceptedStatements.insert(index)
                     }
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(AppColors.orange)
-                    
-                    Text("和")
-                        .font(.system(size: 14))
-                        .foregroundColor(AppColors.mediumBrown)
-                    
-                    Button("隱私政策") {
-                        // TODO: 顯示隱私政策
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: acceptedStatements.contains(index) ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 22))
+                            .foregroundColor(AppColors.orange)
+                        Text(PrivacyPolicyContent.consentStatements[index])
+                            .font(.system(size: 14))
+                            .multilineTextAlignment(.leading)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(AppColors.orange)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .disabled(viewModel.isLoading)
+                .accessibilityIdentifier("privacy-consent-\(index)")
+                .accessibilityValue(acceptedStatements.contains(index) ? "已勾選" : "未勾選")
             }
-            
-            Spacer()
         }
+        .foregroundColor(AppColors.mediumBrown)
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(AppColors.lightYellow.opacity(0.5))
-        )
+        .background(RoundedRectangle(cornerRadius: 8).fill(AppColors.lightYellow.opacity(0.5)))
     }
-    
-    
+
     // 錯誤訊息視圖
     var errorMessageView: some View {
         HStack(spacing: 8) {
@@ -968,6 +968,7 @@ private extension RegisterPage {
     }
     
     func performRegistration() {
+        guard agreeToTerms, !viewModel.isLoading else { return }
         // 隱藏鍵盤
         focusedField = nil
         viewModel.errorMessage = ""

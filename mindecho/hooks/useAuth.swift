@@ -140,7 +140,7 @@ class AuthViewModel: ObservableObject {
                     if response.success == true {
                         if let token = response.token,
                            let user = response.user {
-                            self?.showSuccess(response.message ?? "註冊成功！歡迎加入 MindEcho！")
+                            self?.showSuccess(response.message ?? "註冊成功！歡迎加入 PsychEcho！")
                             self?.shouldShowDailyCheckIn = false
                             self?.sendRegistrationSuccessNotification(message: response.message ?? "註冊成功！")
                             self?.syncImportantQuoteAfterRegistration(
@@ -153,7 +153,7 @@ class AuthViewModel: ObservableObject {
                             self?.loginAfterRegistration(
                                 email: trimmedEmail,
                                 password: password,
-                                successMessage: response.message ?? "註冊成功！歡迎加入 MindEcho！"
+                                successMessage: response.message ?? "註冊成功！歡迎加入 PsychEcho！"
                             )
                         }
                     } else {

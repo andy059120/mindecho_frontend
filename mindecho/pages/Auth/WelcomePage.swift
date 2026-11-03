@@ -95,13 +95,13 @@ private extension WelcomePage {
     // 頂部裝飾
     var topDecoration: some View {
         VStack(spacing: 8) {
-            // MindEcho Logo
+            // PsychEcho Logo
             HStack {
                 Image(systemName: "brain.head.profile")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(AppColors.orange)
                 
-                Text("MindEcho")
+                Text("PsychEcho")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(AppColors.darkBrown)
             }
@@ -308,7 +308,7 @@ struct WelcomePageData {
         ),
         WelcomePageItem(
             title: "24/7 隨時陪伴",
-            description: "無論何時何地，MindEcho 都在這裡傾聽您的心聲，提供即時的情感支持和專業建議",
+            description: "無論何時何地，PsychEcho 都在這裡傾聽您的心聲，提供即時的情感支持和專業建議",
             systemImageName: "clock.arrow.circlepath",
             accentColor: AppColors.mediumBrown
         ),

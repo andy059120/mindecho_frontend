@@ -63,8 +63,8 @@ final class DailyReminderNotificationManager: NSObject, UNUserNotificationCenter
         center.removePendingNotificationRequests(withIdentifiers: [reminderIdentifier])
 
         let content = UNMutableNotificationContent()
-        content.title = "MindEcho 每日提醒"
-        content.body = "記得登入 MindEcho，紀錄今天的身心狀態。"
+        content.title = "PsychEcho 每日提醒"
+        content.body = "記得登入 PsychEcho，紀錄今天的身心狀態。"
         content.sound = .default
 
         var dateComponents = DateComponents()

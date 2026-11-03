@@ -115,13 +115,13 @@ private extension LoginPage {
             
             // Logo 和標題
             VStack(spacing: 12) {
-                // MindEcho Logo
+                // PsychEcho Logo
                 HStack {
                     Image(systemName: "brain.head.profile")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(AppColors.orange)
                     
-                    Text("MindEcho")
+                    Text("PsychEcho")
                         .font(.system(size: 36, weight: .bold))
                         .foregroundColor(AppColors.darkBrown)
                 }
@@ -251,7 +251,7 @@ private extension LoginPage {
 
     var privacyConsentSection: some View {
         VStack(spacing: 10) {
-            Text("登入即表示您已閱讀並同意 MindEcho 隱私權保護政策與使用聲明。")
+            Text("登入即表示您已閱讀並同意 PsychEcho 隱私權保護政策與使用聲明。")
                 .font(.system(size: 12))
                 .foregroundColor(AppColors.mediumBrown.opacity(0.8))
                 .multilineTextAlignment(.center)
@@ -487,7 +487,7 @@ struct PrivacyPolicyStatementView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("MindEcho")
+                    Text("PsychEcho")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(AppColors.orange)
                         .padding(.horizontal, 10)
@@ -559,46 +559,8 @@ struct PrivacyPolicyStatementView: View {
     }
 
     private var warningSection: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("二、重要警語與免責聲明（請務必詳閱）", accent: .warning)
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("⚠️ 【非醫療行為聲明】")
-                        .fontWeight(.bold)
-                    Text("本服務僅作為日常情緒陪伴與自我覺察之輔助工具，絕非醫療行為、心理治療，亦非經主管機關核准之醫療器材。")
-                    Text("本服務由 AI 模型自動生成回應，不具備醫師、臨床心理師或諮商心理師之專業資格，任何對話內容均不構成醫療診斷、治療建議或處方。")
-                    
-                    Divider().padding(.vertical, 4)
-                    
-                    Text("⚠️ 【特殊用途與緊急狀況限制】")
-                        .fontWeight(.bold)
-                    Text("本服務嚴禁作為重度精神疾病治療、緊急生命危機干預等特殊用途。若您正經歷自殺意念、自傷衝動、急性精神症狀或重大心理危機，請立即尋求專業協助：")
-                    Text("• 衛福部安心專線：1925（依舊愛我）")
-                    Text("• 生命線協談專線：1995")
-                    Text("• 張老師輔導專線：1980")
-                    Text("• 請立即前往就近之醫療院所急診就醫")
-
-                    Divider().padding(.vertical, 4)
-
-                    Text("⚠️ 【輔助性質與責任限制】")
-                        .fontWeight(.bold)
-                    Text("使用者因個人決策所產生之任何直接或間接後果，應自行承擔相關風險；本服務在法律允許之最大範圍內，不承擔任何明示或默示之保證與損害賠償責任。")
-                }
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(Color(red: 0.45, green: 0.15, blue: 0.08))
-                .lineSpacing(4)
-                .padding(18)
-                .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(Color(red: 1.0, green: 0.95, blue: 0.92))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                .stroke(Color(red: 0.89, green: 0.49, blue: 0.20).opacity(0.32), lineWidth: 1.2)
-                        )
-                )
-                .shadow(color: Color(red: 0.89, green: 0.49, blue: 0.20).opacity(0.08), radius: 10, x: 0, y: 4)
-            }
-        }
+        section(title: "二、重要警語與免責聲明（請務必詳閱）", body: PrivacyPolicyContent.warningSection, accent: .warning)
+    }
 
     private var commitmentSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -620,8 +582,8 @@ struct PrivacyPolicyStatementView: View {
             sectionTitle("六、資料保存期限", accent: .regular)
 
             VStack(alignment: .leading, spacing: 12) {
-                retentionRow(title: "帳號基本資料", period: "帳號存續期間", disposal: "帳號刪除後 30 日內永久刪除")
-                retentionRow(title: "對話內容", period: "帳號存續期間或您主動刪除為止", disposal: "軟刪除後 30 日永久清除")
+                retentionRow(title: "帳號基本資料", period: "帳號存續期間", disposal: "帳號刪除後 120 日內永久刪除")
+                retentionRow(title: "對話內容", period: "帳號存續期間或您主動刪除為止", disposal: "軟刪除後 120 日永久清除")
                 retentionRow(title: "技術日誌", period: "90 日", disposal: "自動覆寫")
                 retentionRow(title: "已去識別化之統計資料", period: "不限期", disposal: "不可還原")
             }
@@ -646,27 +608,7 @@ struct PrivacyPolicyStatementView: View {
     }
 
     private var rightsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("七、您的權利（個資法第 3 條）", accent: .regular)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("您就本服務蒐集之個人資料，得行使下列權利：")
-                Text("• 查詢或請求閱覽：透過帳號設定查看您的個人資料與對話紀錄")
-                Text("• 請求對話文本：申請匯出您的全部對話紀錄（JSON / TXT 格式）")
-                Text("• 請求補充或更正：修改錯誤或過時之資料")
-                Text("• 請求停止蒐集、處理或利用：暫停 AI 互動但保留歷史紀錄")
-                Text("• 請求刪除：永久刪除帳號及所有對話資料（不可復原）")
-                Text("行使方式：")
-                Text("• 帳號設定頁面內之自助操作")
-                Text("• 來信至：yulmitz753220@gmail.com")
-                Text("本服務將於收到請求後 7 日內回覆並處理。")
-            }
-            .font(.system(size: 14))
-            .foregroundColor(AppColors.mediumBrown)
-            .lineSpacing(4)
-            .padding(18)
-            .modifier(LegalCardStyle())
-        }
+        section(title: "七、您的權利（個資法第 3 條）", body: PrivacyPolicyContent.rightsSection, accent: .regular)
     }
 
     private var appendixSection: some View {
@@ -674,12 +616,9 @@ struct PrivacyPolicyStatementView: View {
             sectionTitle("附錄 A：使用聲明（簡要重點）", accent: .success)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("✅ 我已年滿 18 歲，或已取得法定代理人同意。")
-                Text("✅ 我了解本服務由 AI 提供回應，並非醫療行為。")
-                Text("✅ 我了解本服務無法處理緊急精神危機，遇危機時將撥打 1925 / 1995 等專線或就醫。")
-                Text("✅ 我同意對話內容會傳送至雲端 LLM 供應商進行推論運算。")
-                Text("✅ 我同意本政策所述之蒐集、處理、利用方式。")
-                Text("✅ 我了解我得隨時行使查詢、更正、停止與刪除等個資權利。")
+                ForEach(PrivacyPolicyContent.consentStatements.indices, id: \.self) { index in
+                    Text(PrivacyPolicyContent.consentStatements[index])
+                }
             }
             .font(.system(size: 14, weight: .medium))
             .foregroundColor(AppColors.darkBrown)
@@ -749,44 +688,177 @@ private struct LegalCardStyle: ViewModifier {
 }
 
 enum PrivacyPolicyContent {
+    static let consentStatements = [
+        "我已年滿 18 歲，或已取得法定代理人同意。",
+        "我了解本服務由 AI 提供回應，並非醫療行為。",
+        "我了解本服務無法處理緊急精神危機，遇危機時將撥打 1925 / 1995 等專線或就醫。",
+        "我同意對話內容會傳送至雲端 LLM 供應商進行推論運算。",
+        "我同意本政策所述之蒐集、處理、利用方式。",
+        "我了解我得隨時行使查詢、更正、停止與刪除等個資權利。",
+    ]
+
+    static let appendixSection = """
+✅ 我已年滿 18 歲，或已取得法定代理人同意。
+
+✅ 我了解本服務由 AI 提供回應，並非醫療行為。
+
+✅ 我了解本服務無法處理緊急精神危機，遇危機時將撥打 1925 / 1995 等專線或就醫。
+
+✅ 我同意對話內容會傳送至雲端 LLM 供應商進行推論運算。
+
+✅ 我同意本政策所述之蒐集、處理、利用方式。
+
+✅ 我了解我得隨時行使查詢、更正、停止與刪除等個資權利。
+"""
+
+    static let rightsSection = """
+您就本服務蒐集之個人資料，得行使下列權利：
+
+查詢或請求閱覽：透過帳號設定查看您的個人資料與對話紀錄
+
+請求對話文本：申請匯出您的全部對話紀錄（JSON / TXT 格式）
+
+請求補充或更正：修改錯誤或過時之資料
+
+請求停止蒐集、處理或利用：暫停 AI 互動但保留歷史紀錄
+
+請求刪除：永久刪除帳號及所有對話資料（不可復原）
+
+行使方式：
+
+帳號設定頁面內之自助操作
+
+來信至：pywu@nccu.edu.tw
+
+本服務將於收到請求後 7 日內回覆並處理。
+"""
+
+    static let retentionSection = """
+帳號基本資料：
+
+保存期限：帳號存續期間
+
+銷毀方式：帳號刪除後 120 日內永久刪除
+
+對話內容：
+
+保存期限：帳號存續期間或您主動刪除為止
+
+銷毀方式：軟刪除後 120 日永久清除
+
+技術日誌：
+
+保存期限：90 日
+
+銷毀方式：自動覆寫
+
+已去識別化之統計資料：
+
+保存期限：不限期
+
+銷毀方式：不可還原
+"""
+
+    static let commitmentSection = """
+❌ 不會將您可識別之個人資料出售、出租或交換予任何第三方
+
+❌ 不會用於廣告投放或行銷分析
+"""
+
+    static let warningSection = """
+⚠️ 【非醫療與非專業心理服務聲明】
+
+本服務提供 AI 情緒陪伴與自我探索對話，不提供醫療診斷、處方、心理衡鑑或專業心理治療，亦不能替代就醫、心理諮商或其他專業服務。
+
+與您互動的 AI 並非醫師、臨床心理師或諮商心理師，不具備專業資格；其回應不構成專業診斷、個別化治療建議或處方。請勿僅依本服務內容自行判定病情、延誤就醫，或開始、停止及調整藥物與治療。
+
+⚠️ 【AI 回應與使用成效限制】
+
+AI 可能誤解您的描述、忽略重要資訊，或產生錯誤、不完整、不適切及不符合您需求的回應。本服務不保證回應的正確性、完整性或適用性，亦不保證能改善情緒、心理狀態、精神症狀或人際關係。
+
+使用者應審慎判斷回應內容，避免僅依本服務作成涉及身心健康、安全或其他重大權益的決策。如回應使您感到不適、困惑或困擾加劇，請暫停使用，並視需要尋求合格專業人員協助。
+
+⚠️ 【人工監看與機構通知限制】
+
+除非本服務或合作機構已另行與您約定，或在使用前明確告知特定安排，本服務不提供人工即時監看，亦不會因您輸入特定內容而自動通知您所屬的學校、社區服務單位、醫療機構或其他機構。
+
+即使您透過合作機構使用本服務，也不代表該機構的教師、心理師、醫療人員或其他工作人員正在閱讀您的對話，或會即時收到通知。請勿將傳送訊息至本服務，視為已向相關人員求助或完成危機通報。
+
+若另有人工檢視、風險通知或機構聯繫機制，其適用範圍、處理時段、通知對象及資料利用方式，應於使用前另行說明。上述限制不影響相關人員在實際知悉特定情事後，依法應履行的通報或必要處置義務。
+
+⚠️ 【緊急狀況與危機救援限制】
+
+本服務不適合作為急性精神症狀、重大心理危機或緊急生命危險的主要處理工具，亦不能取代專業危機評估與處置。
+
+本服務無法保證正確或及時辨識自殺、自傷、傷害他人或其他危機，也不保證能自動通報、聯繫緊急聯絡人、派遣救援或取得您所在位置。即使系統未顯示警示，也不代表您目前沒有風險；即使顯示求助提醒，也不代表已有專業人員接手處理。
+
+若您出現自殺意念、自傷衝動、急性精神症狀或重大心理危機，請主動聯繫合格專業人員，或撥打衛生福利部安心專線：1925。
+
+如有立即危險，請立即尋求當地緊急救援或前往就近醫療院所急診，並盡可能請可信任的人陪同；請勿等待本服務回覆或通知他人。
+
+⚠️ 【輔助性質與責任限制】
+
+本服務的輔助性質與上述限制，不代表將所有使用風險或損害責任轉由使用者承擔。本服務提供者仍應依法履行個人資料保護、資訊安全及其他應負義務。
+
+本服務之責任應依適用法律及具體事實認定；本聲明不排除或限制本服務提供者因故意、重大過失，或其他依法不得免除或限制之事由所應負之責任，亦不影響使用者依法享有之權利。
+"""
+
     static let introduction = """
-歡迎使用 MindEcho（以下簡稱「本服務」）。本服務是一套以人工智慧（AI）為基礎之情緒陪伴與自我探索輔助平台。本服務提供對話引導，旨在協助使用者於日常生活中進行自我覺察與情緒整理。
+歡迎使用 PsychEcho（以下簡稱「本服務」）。本服務是一套以人工智慧（AI）為基礎的情緒陪伴與自我探索輔助平台，透過對話引導，協助使用者在日常生活中進行自我覺察與情緒整理。
 
 【重要定位告知】
-本服務僅作為日常個人成長與陪伴之「輔助性工具」，絕非醫療器材，亦不提供任何醫療診斷或治療服務。
 
-我們深知心理健康相關資料屬於高度敏感之個人資料，故依據《個人資料保護法》（下稱「個資法」）、相關施行細則及國際隱私保護原則制定本政策，明確說明本服務蒐集、處理、利用您個人資料之方式、免責條款以及您所享有之權利。
+本服務僅作為日常個人成長、情緒陪伴與自我探索的輔助工具，不提供醫療診斷、處方或專業心理治療，亦不能取代醫師、臨床心理師、諮商心理師或其他合格專業人員的評估與服務。
+
+本服務的回應由 AI 自動生成，可能包含錯誤、不完整或不適切的內容，不保證適用於您的個別情況，亦不保證能改善心理狀態、緩解症狀或達成特定成效。
+
+我們重視您的隱私，並理解對話可能涉及高度敏感的心理健康及其他個人資料，因此依據《個人資料保護法》（以下簡稱「個資法」）及相關法令制定本政策，說明個人資料的蒐集、處理與利用方式、服務限制，以及您所享有的權利。
 """
 
     static let dataCategories = """
 依個資法第 2 條第 1 款及第 6 條規定，本服務可能蒐集下列資料：
 
 3.1 帳號基本資料
-- 電子郵件信箱、帳號密碼、使用者暱稱（選填）
+
+電子郵件信箱、帳號密碼、使用者暱稱（選填）
 
 3.2 互動內容（屬個資法第 6 條「特種個資」範疇）
-- 您與 AI 對話之完整文字內容
-- 您所選擇之引導模式（CBT / MBT / MBCT / DBT / INITIAL 初診分流）
-- 對話時間戳記、系統回覆內容及所引用之參考摘要
+
+您與 AI 對話之完整文字內容
+
+您所選擇之引導模式（CBT / MBT / MBCT / DBT / INITIAL 初診分流）
+
+對話時間戳記、系統回覆內容及所引用之參考摘要
+
+心理測驗、量表、自我評估等以及分析結果
 
 3.3 裝置與技術資料（一般 App 運作必要資料）
-- 裝置型號、作業系統版本、IP 位址、網路連線狀態
-- 登入與登出時間戳記、操作行為日誌（Logs）
-- 崩潰報告（Crash Logs）與 API 錯誤紀錄
+
+裝置型號、作業系統版本、IP 位址、網路連線狀態
+
+登入與登出時間戳記、操作行為日誌（Logs）
+
+崩潰報告（Crash Logs）與 API 錯誤紀錄
 
 3.4 使用者自願提供資料
-- 您於對話中主動分享之人際、生活或生理心理描述
+
+您於對話中主動分享之人際、生活或生理心理描述
 """
 
     static let purposes = """
 本服務蒐集與利用資料之目的如下：
 
-- 提供對話服務：傳送訊息至大型語言模型（LLM）生成陪伴回應
-- 維持上下文連貫性：暫存會話歷史以保持對話脈絡
-- 輔助內容檢索：依對話主題索引公開參考資料輔助生成回覆
-- 服務維運與除錯：排查閃退、異常請求，確保系統連線安全
-- 服務改善：經完全去識別化（匿名化）處理後，進行品質評估與演算法優化
-- 法令配合：於符合司法機關法定程序下配合調查
+提供對話服務：傳送訊息至大型語言模型（LLM）生成陪伴回應
+
+維持上下文連貫性：暫存會話歷史以保持對話脈絡
+
+輔助內容檢索：依對話主題索引公開參考資料輔助生成回覆
+
+服務維運與除錯：排查閃退、異常請求，確保系統連線安全
+
+服務改善：經完全去識別化（匿名化）處理後，進行品質評估與演算法優化
+
+法令配合：於符合司法機關法定程序下配合調查
 """
 
     static let thirdPartyProcessing = """
@@ -796,19 +868,26 @@ enum PrivacyPolicyContent {
 """
 
     static let minors = """
-1. 未滿 18 歲之使用者，須經法定代理人（家長或監護人）充分閱讀並同意本聲明後始得使用。
-2. 本服務不向未滿 13 歲之兒童提供服務。
-3. 若發現未成年人未取得同意註冊，本服務有權暫停帳號並刪除相關資料。
+未滿 18 歲之使用者，須經法定代理人（家長或監護人）充分閱讀並同意本聲明後始得使用。
+
+本服務不向未滿 12 歲之兒童提供服務。
+
+若發現未成年人未取得同意註冊，本服務有權暫停帳號並刪除相關資料。
 """
 
     static let security = """
 本服務實施下列安全控管機制：
-- 全站傳輸採用 TLS/HTTPS 加密
-- 資料庫對敏感性欄位施行加密儲存（Encryption at Rest）
-- 內部存取嚴格遵循「最小授權原則（Least Privilege）」
-- 系統定期執行漏洞修補、防護稽核與異常存取告警
+
+全站傳輸採用 TLS/HTTPS 加密
+
+資料庫對敏感性欄位施行加密儲存（Encryption at Rest）
+
+內部存取嚴格遵循「最小授權原則（Least Privilege）」
+
+系統定期執行漏洞修補、防護稽核與異常存取警告
 
 【安全免責提醒】
+
 儘管我們採取了業界標準之防護，網際網路環境仍無法保證絕對安全。請您妥善保管個人密碼，切勿將帳號借予他人或於公開環境儲存憑證。
 """
 
@@ -821,8 +900,9 @@ enum PrivacyPolicyContent {
 """
 
     static let governingLaw = """
-1. 責任限制：在法律允許之最大範圍內，本服務對於因不可抗力、第三方雲端斷線、網路異常或使用者個人不當依賴所造成之損害，均不承擔連帶損害賠償責任。
-2. 準據法與管轄：本政策之解釋與適用均以中華民國法律為準據法，並以臺灣臺北地方法院為第一審管轄法院。
+責任限制：在法律允許之最大範圍內，本服務對於因不可抗力、第三方雲端斷線、網路異常或使用者個人不當依賴所造成之損害，均不承擔連帶損害賠償責任。
+
+準據法與管轄：本政策之解釋與適用均以中華民國法律為準據法，並以臺灣臺北地方法院為第一審管轄法院。
 """
 }
 
