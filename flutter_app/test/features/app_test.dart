@@ -10,6 +10,8 @@ import 'package:mindecho_flutter/features/auth/auth_controller.dart';
 
 import '../support.dart';
 
+import 'package:mindecho_flutter/core/platform/media_picker.dart';
+
 void main() {
   testWidgets('登入 → 聊天列表 → 紀錄 → 發訊息 → 登出，移除敏感畫面', (tester) async {
     final client = MockClient((request) async {
@@ -63,6 +65,7 @@ void main() {
         content: testChatContent,
         catalog: testCatalog,
         accountStore: MemoryAccountStore(),
+        mediaPicker: MediaPicker(pendingStore: MemoryAccountStore()),
       ),
     );
     await tester.pumpAndSettle();

@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 
 import '../core/platform/local_media_store.dart';
+import '../core/platform/media_picker.dart';
+import '../shared/widgets.dart';
 import '../core/storage/account_store.dart';
 import '../features/auth/auth_controller.dart';
 import '../features/check_in/check_in_page.dart';
@@ -23,6 +25,7 @@ class MainShell extends StatefulWidget {
     required this.content,
     required this.catalog,
     this.store,
+    this.mediaPicker,
     this.promptCheckIn = true,
     super.key,
   });
@@ -30,6 +33,7 @@ class MainShell extends StatefulWidget {
   final ChatContent content;
   final DashboardCatalog catalog;
   final AccountStore? store;
+  final MediaPicker? mediaPicker;
   final bool promptCheckIn;
   @override
   State<MainShell> createState() => _MainShellState();
@@ -48,11 +52,28 @@ class _MainShellState extends State<MainShell> {
   late final _media = LocalMediaStore(_accountId, _store);
   final _navigatorKeys = List.generate(4, (_) => GlobalKey<NavigatorState>());
   int _tab = 0;
+  bool _recoveringMedia = true;
+  String? _mediaError;
   int? _tour;
   @override
   void initState() {
     super.initState();
+    _recoverMedia();
     _load();
+  }
+
+  Future<void> _recoverMedia() async {
+    setState(() {
+      _recoveringMedia = true;
+      _mediaError = null;
+    });
+    try {
+      await (widget.mediaPicker ?? MediaPicker()).recover(_media);
+    } catch (_) {
+      if (mounted) setState(() => _mediaError = '無法恢復媒體匯入，請確認儲存空間後重試');
+    } finally {
+      if (mounted) setState(() => _recoveringMedia = false);
+    }
   }
 
   Future<void> _load() async {
@@ -81,152 +102,170 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
-    return CupertinoPageScaffold(
-      child: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    IndexedStack(
-                      index: _tab,
-                      children: [
-                        for (var i = 0; i < 4; i++)
-                          CupertinoTabView(
-                            navigatorKey: _navigatorKeys[i],
-                            builder: (context) => switch (i) {
-                              0 => HomePage(
-                                controller: _controller,
-                                store: _store,
-                                media: _media,
-                                catalog: widget.catalog,
-                                onTour: () => setState(() => _tour = 0),
-                              ),
-                              1 => ChatListPage(
-                                auth: widget.auth,
-                                content: widget.content,
-                                embedded: true,
-                              ),
-                              2 => TrackingPage(
-                                controller: _controller,
-                                store: _store,
-                              ),
-                              _ => ProfilePage(
-                                controller: _controller,
-                                media: _media,
-                              ),
-                            },
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              if (!(_tab == 1 && keyboard))
-                ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.systemBackground.withValues(
-                          alpha: .8,
-                        ),
-                        border: const Border(
-                          top: BorderSide(
-                            color: CupertinoColors.separator,
-                            width: .5,
-                          ),
-                        ),
-                      ),
-                      child: SafeArea(
-                        top: false,
-                        child: SizedBox(
-                          height: 70,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Row(
+    return PopScope(
+      canPop: _tour == null,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _tour != null) setState(() => _tour = null);
+      },
+      child: CupertinoPageScaffold(
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                if (_mediaError != null)
+                  SafeArea(
+                    bottom: false,
+                    child: ErrorNotice(_mediaError!, onRetry: _recoverMedia),
+                  ),
+                Expanded(
+                  child: _recoveringMedia
+                      ? const Center(child: CupertinoActivityIndicator())
+                      : Stack(
+                          children: [
+                            IndexedStack(
+                              index: _tab,
                               children: [
                                 for (var i = 0; i < 4; i++)
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 8,
-                                      ),
-                                      child: CupertinoButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () =>
-                                            setState(() => _tab = i),
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: _tab == i
-                                                ? CupertinoColors.systemOrange
-                                                      .withValues(alpha: .15)
-                                                : null,
-                                            borderRadius: BorderRadius.circular(
-                                              12,
+                                  TickerMode(
+                                    enabled: i == _tab && _tour == null,
+                                    child: CupertinoTabView(
+                                      navigatorKey: _navigatorKeys[i],
+                                      builder: (context) => switch (i) {
+                                        0 => HomePage(
+                                          controller: _controller,
+                                          store: _store,
+                                          media: _media,
+                                          catalog: widget.catalog,
+                                          onTour: () =>
+                                              setState(() => _tour = 0),
+                                        ),
+                                        1 => ChatListPage(
+                                          auth: widget.auth,
+                                          content: widget.content,
+                                          embedded: true,
+                                        ),
+                                        2 => TrackingPage(
+                                          controller: _controller,
+                                          store: _store,
+                                        ),
+                                        _ => ProfilePage(
+                                          controller: _controller,
+                                          media: _media,
+                                        ),
+                                      },
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                ),
+                if (!(_tab == 1 && keyboard))
+                  ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.systemBackground.withValues(
+                            alpha: .8,
+                          ),
+                          border: const Border(
+                            top: BorderSide(
+                              color: CupertinoColors.separator,
+                              width: .5,
+                            ),
+                          ),
+                        ),
+                        child: SafeArea(
+                          top: false,
+                          child: SizedBox(
+                            height: 70,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  for (var i = 0; i < 4; i++)
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 8,
+                                        ),
+                                        child: CupertinoButton(
+                                          padding: EdgeInsets.zero,
+                                          onPressed: () =>
+                                              setState(() => _tab = i),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 200,
                                             ),
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SystemSymbol(
-                                                _tabs[i].$2,
-                                                size: 15,
-                                                weight: 'semibold',
-                                                color: _tab == i
-                                                    ? CupertinoColors
-                                                          .systemOrange
-                                                    : CupertinoColors
-                                                          .secondaryLabel,
-                                                fallback: _tabs[i].$3,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                _tabs[i].$1,
-                                                style: TextStyle(
-                                                  fontSize: 13,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: _tab == i
+                                                  ? CupertinoColors.systemOrange
+                                                        .withValues(alpha: .15)
+                                                  : null,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SystemSymbol(
+                                                  _tabs[i].$2,
+                                                  size: 15,
+                                                  weight: 'semibold',
                                                   color: _tab == i
                                                       ? CupertinoColors
                                                             .systemOrange
                                                       : CupertinoColors
                                                             .secondaryLabel,
+                                                  fallback: _tabs[i].$3,
                                                 ),
-                                              ),
-                                            ],
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  _tabs[i].$1,
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: _tab == i
+                                                        ? CupertinoColors
+                                                              .systemOrange
+                                                        : CupertinoColors
+                                                              .secondaryLabel,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          if (_tour != null)
-            Positioned.fill(
-              child: TabTourOverlay(
-                index: _tour!,
-                title: _tabs[_tour!].$1,
-                message: _tourText[_tour!],
-                onClose: () => setState(() => _tour = null),
-                onNext: () =>
-                    setState(() => _tour = _tour == 3 ? null : _tour! + 1),
-              ),
+              ],
             ),
-        ],
+            if (_tour != null)
+              Positioned.fill(
+                child: TabTourOverlay(
+                  index: _tour!,
+                  title: _tabs[_tour!].$1,
+                  message: _tourText[_tour!],
+                  onClose: () => setState(() => _tour = null),
+                  onNext: () =>
+                      setState(() => _tour = _tour == 3 ? null : _tour! + 1),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

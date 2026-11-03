@@ -19,6 +19,8 @@ import 'package:mindecho_flutter/features/scales/scale_page.dart';
 
 import '../support.dart';
 
+import 'package:mindecho_flutter/core/platform/media_picker.dart';
+
 Future<AuthController> signedIn(http.Client client) async {
   final auth = AuthController(ApiClient(client: client), MemoryStore());
   await auth.login('test@example.com', 'test', remember: false);
@@ -270,6 +272,7 @@ void main() {
             content: testChatContent,
             catalog: catalog,
             store: MemoryAccountStore(),
+            mediaPicker: MediaPicker(pendingStore: MemoryAccountStore()),
           ),
         ),
       );

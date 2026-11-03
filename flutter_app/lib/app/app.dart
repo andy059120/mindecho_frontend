@@ -8,6 +8,7 @@ import '../features/auth/welcome_page.dart';
 import '../features/chat/chat_content.dart';
 import '../features/dashboard/catalog.dart';
 import '../core/storage/account_store.dart';
+import '../core/platform/media_picker.dart';
 import 'main_shell.dart';
 import '../shared/widgets.dart';
 import 'theme.dart';
@@ -18,12 +19,14 @@ class MindEchoApp extends StatefulWidget {
     this.content,
     this.catalog,
     this.accountStore,
+    this.mediaPicker,
     super.key,
   });
   final AuthController auth;
   final ChatContent? content;
   final DashboardCatalog? catalog;
   final AccountStore? accountStore;
+  final MediaPicker? mediaPicker;
   @override
   State<MindEchoApp> createState() => _MindEchoAppState();
 }
@@ -78,6 +81,15 @@ class _MindEchoAppState extends State<MindEchoApp> {
                 ),
               ),
             )
+          : defaultTargetPlatform == TargetPlatform.android
+          ? AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.dark.copyWith(
+                statusBarColor: const Color(0x00000000),
+                systemNavigationBarColor: const Color(0x00000000),
+                systemNavigationBarContrastEnforced: true,
+              ),
+              child: child!,
+            )
           : child!,
       locale: const Locale.fromSubtags(
         languageCode: 'zh',
@@ -107,6 +119,7 @@ class _MindEchoAppState extends State<MindEchoApp> {
               content: _content!,
               catalog: _catalog!,
               store: widget.accountStore,
+              mediaPicker: widget.mediaPicker,
             ),
     ),
   );

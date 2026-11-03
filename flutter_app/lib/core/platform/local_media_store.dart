@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'media_files_io.dart'
-    if (dart.library.js_interop) 'media_files_web.dart' as files;
+    if (dart.library.js_interop) 'media_files_web.dart'
+    as files;
 
 import '../storage/account_store.dart';
 
@@ -42,7 +43,8 @@ class LocalMediaStore {
   LocalMediaStore(this.accountId, this.store);
   final String accountId;
   final AccountStore store;
-  Future<String> path(String filename) => files.mediaPath(accountId, store, filename);
+  Future<String> path(String filename) =>
+      files.mediaPath(accountId, store, filename);
 
   Future<List<LocalItem>> load() async {
     final raw = await store.read('treasure.v1');
@@ -56,12 +58,18 @@ class LocalMediaStore {
     'treasure.v1',
     jsonEncode(items.map((e) => e.toJson()).toList()),
   );
-  Future<LocalItem> importFile(String source, String kind) async {
-    final id = DateTime.now().microsecondsSinceEpoch.toString();
+  Future<LocalItem> importFile(
+    String source,
+    String kind, {
+    String? operationId,
+  }) async {
+    final id = operationId ?? DateTime.now().microsecondsSinceEpoch.toString();
     final file = XFile(source);
     final extension = !kIsWeb && source.contains('.')
         ? source.split('.').last.replaceAll(RegExp('[^a-zA-Z0-9]'), '')
-        : kind == 'image' ? 'jpg' : 'mp4';
+        : kind == 'image'
+        ? 'jpg'
+        : 'mp4';
     final filename = '$id.$extension';
     final data = await file.readAsBytes();
     // 瀏覽器資料與其他帳號資料共用儲存配額，首版限制單檔大小。
@@ -85,8 +93,9 @@ class LocalMediaStore {
   Future<void> removeFile(String filename) =>
       files.deleteMedia(accountId, store, filename);
 
-  Future<void> setAvatar(String source) async {
-    final name = 'avatar-${DateTime.now().microsecondsSinceEpoch}.jpg';
+  Future<void> setAvatar(String source, {String? operationId}) async {
+    final name =
+        'avatar-${operationId ?? DateTime.now().microsecondsSinceEpoch}.jpg';
     final data = await XFile(source).readAsBytes();
     if (kIsWeb && data.length > 2 * 1024 * 1024) {
       throw const FormatException('網頁版目前支援 2 MB 以下的頭貼');
@@ -94,7 +103,7 @@ class LocalMediaStore {
     await files.writeMedia(accountId, store, name, data);
     final old = await store.read('avatar');
     await store.write('avatar', name);
-    if (old != null) await removeFile(old);
+    if (old != null && old != name) await removeFile(old);
   }
 
   Future<Uint8List?> avatar() async {

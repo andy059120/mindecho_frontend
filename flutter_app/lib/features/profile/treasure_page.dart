@@ -1,8 +1,11 @@
 import '../../core/platform/media_files_io.dart'
-    if (dart.library.js_interop) '../../core/platform/media_files_web.dart' as files;
+    if (dart.library.js_interop) '../../core/platform/media_files_web.dart'
+    as files;
 
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
+
+import '../../core/platform/media_picker.dart';
+
 import 'package:video_player/video_player.dart';
 
 import '../../app/theme.dart';
@@ -98,14 +101,9 @@ class _TreasurePageState extends State<TreasurePage> {
     if (_busy || _loading || _loadFailed) return;
     setState(() => _busy = true);
     try {
-      final picker = ImagePicker();
-      final file = kind == 'image'
-          ? await picker.pickImage(source: ImageSource.gallery)
-          : await picker.pickVideo(source: ImageSource.gallery);
-      if (file != null) {
-        final item = await widget.store.importFile(file.path, kind);
-        await _commit([..._items, item]);
-      }
+      await MediaPicker().pick(widget.store, kind);
+      final items = await widget.store.load();
+      if (mounted) setState(() => _items = items);
     } on FormatException catch (error) {
       if (mounted) setState(() => _error = error.message);
     } catch (_) {

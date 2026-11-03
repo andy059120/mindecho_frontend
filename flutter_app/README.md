@@ -1,12 +1,12 @@
 # MindEcho Flutter
 
-同一個 repository 中的 Flutter iOS 移植專案。Swift 專案保留於上層 `mindecho/`，供功能與畫面對照。
+同一個 repository 中的 Flutter iOS、Android 與 Web 前端。Swift 專案保留於上層 `mindecho/`，供功能與畫面對照。
 
 ## 固定環境
 
 - Flutter **3.47.8 stable**，Dart **3.13.7**；版本記錄於 `.fvmrc`，套件版本記錄於 `pubspec.lock`。
 - iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-5`**，App 顯示名稱 **MindEcho**。
-- 已建立 iOS 與 Web host；Android 尚未建立。Web 為第一版，驗證範圍見下方。
+- 已建立 iOS、Android 與 Web host。Android 第一階段設定、啟動及驗收方式見 [ANDROID.md](ANDROID.md)；Web 為第一版，驗證範圍見下方。
 
 ## 啟動
 

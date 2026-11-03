@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/platform/local_media_store.dart';
+import '../../core/platform/media_picker.dart';
 import '../../shared/system_symbol.dart';
 import '../../shared/swift_detail_navigation_bar.dart';
 import '../../shared/widgets.dart';
@@ -46,14 +47,11 @@ class _ProfilePageState extends State<ProfilePage> {
       if (choice == '使用預設頭像') {
         await widget.media.store.write('avatar', null);
       } else {
-        final image = await ImagePicker().pickImage(
+        await MediaPicker().pick(
+          widget.media,
+          'avatar',
           source: choice == '拍照上傳' ? ImageSource.camera : ImageSource.gallery,
-          maxWidth: 1024,
-          maxHeight: 1024,
-          imageQuality: 90,
         );
-        if (image == null) return;
-        await widget.media.setAvatar(image.path);
       }
       if (mounted) {
         setState(() {
