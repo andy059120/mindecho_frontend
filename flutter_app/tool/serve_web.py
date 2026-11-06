@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """本機 Web 預覽與同源 API 轉送；不適用於正式部署。"""
 import argparse
+import json
+import socket
+import ssl
+import sys
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -8,6 +12,16 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 UPSTREAM = 'https://mindechoserver.com:8443'
+
+
+def upstream_tls_context():
+    context = ssl.create_default_context()
+    # 加入 macOS 系統信任根，保留憑證與 hostname 驗證。
+    system_ca = Path('/etc/ssl/cert.pem')
+    if sys.platform == 'darwin' and system_ca.is_file():
+        context.load_verify_locations(cafile=str(system_ca))
+    return context
+
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -39,11 +53,26 @@ class Handler(SimpleHTTPRequestHandler):
                           data=self.rfile.read(length) if length else None,
                           headers=headers, method=self.command)
         try:
-            response = urlopen(request, timeout=35)
+            response = urlopen(request, context=upstream_tls_context(), timeout=125 if self.command == 'POST' and self.path.split('?')[0].endswith('/messages') else 35)
         except HTTPError as error:
             response = error
-        except (URLError, TimeoutError):
-            self.send_error(502, 'API connection failed')
+        except (URLError, TimeoutError) as error:
+            reason = error.reason if isinstance(error, URLError) else error
+            if isinstance(reason, ssl.SSLError):
+                message = 'API 轉送無法驗證後端 TLS 憑證'
+            elif isinstance(reason, socket.gaierror):
+                message = 'API 轉送無法解析後端網域'
+            elif isinstance(reason, TimeoutError):
+                message = 'API 轉送等待後端回覆逾時'
+            else:
+                message = 'API 轉送無法連線至後端'
+            body = json.dumps({'message': message}).encode('utf-8')
+            self.send_response(502)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            self.wfile.write(body)
             return
         with response:
             body = response.read()

@@ -28,6 +28,7 @@ class ApiClient {
     String? token,
     Map<String, dynamic>? body,
     Map<String, String>? query,
+    Duration timeout = const Duration(seconds: 30),
   }) async {
     final uri = Uri.parse('${baseUrl.replaceFirst(RegExp(r'/$'), '')}$path')
         .replace(queryParameters: query);
@@ -37,8 +38,7 @@ class ApiClient {
     if (token != null) request.headers['Authorization'] = 'Bearer $token';
     if (body != null) request.body = jsonEncode(body);
     try {
-      final response = await _send(request)
-          .timeout(const Duration(seconds: 30));
+      final response = await _send(request).timeout(timeout);
       Map<String, dynamic>? payload;
       if (response.bodyBytes.isNotEmpty) {
         try {

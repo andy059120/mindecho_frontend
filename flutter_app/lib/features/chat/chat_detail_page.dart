@@ -1,3 +1,5 @@
+import '../../core/network/api_client.dart';
+
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
@@ -147,11 +149,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
             : ChatMode.parse(initial!['selectedMode'] as String);
       });
       _scrollToEnd();
-    } catch (_) {
+    } catch (error) {
       if (mounted) {
         setState(() {
           _sendUncertain = true;
-          _error = '未能確認訊息傳送結果。請先重新載入紀錄，確認後再傳送。';
+          _error =
+              '${error is ApiException ? error.message : '伺服器回應格式異常'}。\n未能確認訊息傳送結果，請先重新載入紀錄，確認後再傳送。';
         });
       }
     } finally {

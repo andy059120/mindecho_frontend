@@ -154,6 +154,7 @@ class AuthController extends ChangeNotifier {
     String path, {
     Map<String, dynamic>? body,
     Map<String, String>? query,
+    Duration timeout = const Duration(seconds: 30),
   }) async {
     final generation = _generation;
     final original = session;
@@ -165,6 +166,7 @@ class AuthController extends ChangeNotifier {
         token: original.token,
         body: body,
         query: query,
+        timeout: timeout,
       );
     } on ApiException catch (error) {
       if (error.status != 401) rethrow;
@@ -181,6 +183,7 @@ class AuthController extends ChangeNotifier {
           token: next.token,
           body: body,
           query: query,
+          timeout: timeout,
         );
       } on ApiException catch (retryError) {
         if (retryError.status == 401 && generation == _generation) {

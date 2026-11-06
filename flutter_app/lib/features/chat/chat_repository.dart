@@ -22,6 +22,8 @@ class ChatRepository {
       '/chat/sessions',
       body: {
         'chatbotType': mode.apiValue,
+        // 新建與初談轉接皆固定使用 Claude，不依賴後端 Gemini 預設值。
+        'provider': 'anthropic',
         if (title.trim().isNotEmpty) 'title': title.trim(),
       },
     );
@@ -50,5 +52,6 @@ class ChatRepository {
         'POST',
         '/chat/sessions/${Uri.encodeComponent(id)}/messages',
         body: {'message': message},
+        timeout: const Duration(seconds: 120),
       );
 }

@@ -13,7 +13,7 @@ import '../support.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('建立聊天室及發訊息沿用 Swift API contract，不自動重送失敗 POST', () async {
+  test('建立聊天室指定 Claude，發訊息不自動重送失敗 POST', () async {
     var posts = 0;
     final auth = AuthController(
       ApiClient(
@@ -22,6 +22,7 @@ void main() {
           if (request.url.path == '/api/chat/sessions') {
             expect(jsonDecode(request.body), {
               'chatbotType': 'CBT',
+              'provider': 'anthropic',
               'title': '今天',
             });
             return http.Response(
