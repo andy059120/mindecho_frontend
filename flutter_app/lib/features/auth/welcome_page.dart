@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../shared/system_symbol.dart';
 import 'auth_controller.dart';
 import 'auth_widgets.dart';
@@ -236,9 +237,67 @@ class _WelcomePageState extends State<WelcomePage>
                 ],
               ),
             );
-            return height > constraints.maxHeight
-                ? SingleChildScrollView(child: body)
-                : body;
+            if (WebLayout.wide(context)) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(48),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const AuthBrand(size: 40, iconSize: 36),
+                            const SizedBox(height: 32),
+                            const Text(
+                              '心理健康的智慧夥伴',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.darkBrown,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              '記錄心情、整理感受，\n用自己的步調，慢慢認識自己。',
+                              style: TextStyle(
+                                fontSize: 19,
+                                height: 1.8,
+                                color: AppColors.mediumBrown,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'AI 情緒陪伴與自我探索輔助工具。\n無法取代醫療診斷、心理諮商或緊急救援。',
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.7,
+                                color: AppColors.mediumBrown,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _legalButton(context, '隱私政策'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: WebContentFrame(
+                      maxWidth: 520,
+                      child: SingleChildScrollView(child: body),
+                    ),
+                  ),
+                ],
+              );
+            }
+            return WebContentFrame(
+              maxWidth: 600,
+              child: height > constraints.maxHeight
+                  ? SingleChildScrollView(child: body)
+                  : body,
+            );
           },
         ),
       ),
@@ -290,7 +349,7 @@ const _pages = [
   ),
   _Slide(
     '隱私安全保護',
-    '您的所有對話內容都經過端到端加密，我們承諾絕不會洩露您的個人隱私信息',
+    '對話透過加密通道傳送，並交由雲端 AI 供應商處理；資料利用與保存方式請詳閱隱私政策。',
     'lock.shield',
     AppColors.darkBrown,
     CupertinoIcons.shield,
@@ -316,8 +375,8 @@ class _WelcomeSlide extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 240,
-              height: 240,
+              width: WebLayout.wide(context) ? 180 : 240,
+              height: WebLayout.wide(context) ? 180 : 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(

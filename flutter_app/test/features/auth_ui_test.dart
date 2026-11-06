@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +12,7 @@ import 'package:mindecho_flutter/features/auth/auth_widgets.dart';
 import 'package:mindecho_flutter/features/auth/forgot_password_page.dart';
 
 import '../support.dart';
+import '../privacy_fixture.dart';
 
 Future<AuthController> startApp(
   WidgetTester tester, {
@@ -19,15 +20,13 @@ Future<AuthController> startApp(
   double scale = 1,
 }) async {
   const policyPath = 'assets/data/privacy_policy.json';
-  final policyBytes = await tester.runAsync(
-    () => File(policyPath).readAsBytes(),
-  );
+  final policyBytes = utf8.encode(privacyPolicyFixture);
   rootBundle.evict(policyPath);
   tester.binding.defaultBinaryMessenger.setMockMessageHandler(
     'flutter/assets',
     (message) async {
       final path = const StringCodec().decodeMessage(message);
-      return path == policyPath ? ByteData.sublistView(policyBytes!) : null;
+      return path == policyPath ? ByteData.sublistView(policyBytes) : null;
     },
   );
   tester.view.physicalSize = size;

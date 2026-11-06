@@ -6,7 +6,7 @@
 
 - Flutter **3.47.8 stable**，Dart **3.13.7**；版本記錄於 `.fvmrc`，套件版本記錄於 `pubspec.lock`。
 - iOS 最低版本 **17.6**，Bundle ID **`com.mindecho-2`**，App 顯示名稱 **PsychEcho**。
-- 已建立 iOS、Android 與 Web host。Android 第一階段設定、啟動及驗收方式見 [ANDROID.md](ANDROID.md)；Web 為第一版，驗證範圍見下方。
+- 已建立 iOS、Android 與 Web host。Android 第一階段設定、啟動及驗收方式見 [ANDROID.md](ANDROID.md)；Web 已加入第二版響應式配置，驗證範圍見下方「Web 第二版」。
 
 ## 啟動
 
@@ -211,3 +211,30 @@ fvm flutter build web --release --dart-define=API_BASE_URL=https://your-server.e
 - 本機已安裝的 runtime 為 iOS 17.0、17.5、26.5，沒有 17.6；此次畫面驗收在 **iOS 26.5**，**不代表 iOS 17.6 實機驗收完成**。發布前仍須用 17.6 裝置驗證啟動、登入／Keychain、鍵盤、相片及影片流程。
 - Flutter 系統支援範圍可參考 [官方支援平台文件](https://docs.flutter.dev/reference/supported-platforms)；本專案仍固定 Flutter 3.47.8，實際可部署性以鎖定 SDK、套件及產物檢查為準。
 - 新增窄螢幕圖表切換測試，並補充含 emoji 的長訊息字數與鍵盤測試；完整 42 項測試通過。API、認證、資料 model 與儲存實作未修改。
+
+
+## Web 第二版（2026-11-06）
+
+Web 改為依可用寬度配置內容，沿用 iOS 的暖色、Cupertino 元件、卡片樣式、四分頁內容與原有操作。
+
+- **導覽與寬度**：移除全站 520 px 限制；900 px 起使用 216 px 側邊導覽，較窄視窗維持底部分頁。內容最大 1120 px；縮放視窗保留目前分頁與導覽狀態，較矮視窗可捲動側欄。
+- **歡迎與表單**：桌面歡迎頁改成品牌介紹與輪播／登入入口雙欄；登入、註冊與密碼重設表單最大 560 px，避免欄位隨桌面過度拉寬。
+- **首頁與追蹤**：圖表依實際內容區寬度切換雙欄／單欄；文字放大時回到單欄。量表卡片於寬螢幕自動換列，窄螢幕維持 iOS 橫向捲動。
+- **隱私政策**：Web 使用獨立閱讀頁，原生 App 沿用 sheet。桌面加入固定側邊目錄，三個主題膠囊可跳至對應章節；全文可選取，導覽列保留關閉入口，載入失敗可重試。以 iOS 原始碼對齊漸層頁首、主題膠囊、章節標記、保存期限分組與附錄卡片。
+- **隱私內容與同意**：既有政策 JSON 全文保留；附錄改用與註冊相同的六項聲明來源，預設不勾選。新增 Web 本機資料保存、不同瀏覽器／來源、清除網站資料及登出保留草稿與收藏的說明；個人檔案與桌面側欄皆可開啟政策。
+- **歡迎頁安全文案**：將缺乏實作依據的「端到端加密」改為加密通道傳送及雲端 AI 處理的說明。
+
+### 第二版驗證
+
+```sh
+fvm flutter analyze
+fvm flutter test
+fvm flutter test --platform chrome test/features/auth_ui_test.dart test/features/web_responsive_test.dart test/features/privacy_page_test.dart test/features/app_test.dart
+fvm flutter build web --release --dart-define=API_BASE_URL=/api
+python3 tool/serve_web.py
+```
+
+- 完整 VM 測試 **52 項通過**；指定 Chrome 測試 **14 項通過**。
+- Chrome 涵蓋 320／768／1024／1440 px、短視窗、政策目錄與全文捲動、載入失敗重試、大字閱讀、六項同意與返回保留、九張量表卡片換列、分頁與視窗縮放狀態、Mock 登入／聊天／登出。
+- 第一版 Chrome 政策測試的 asset 載入問題已修復：瀏覽器 widget 測試使用政策 fixture，另由 VM 檢查 fixture 與正式 JSON、六項聲明一致；正式 App 仍讀取原政策 asset。
+- 本機 release 網頁實際檢查桌面與手機的歡迎／政策頁。未使用真實帳號或提交後端資料；未部署至公開網址。既有 API、瀏覽器儲存、CORS、媒體及未移植功能的限制仍適用。

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../core/storage/account_store.dart';
 import '../../shared/widgets.dart';
 import '../../shared/swift_menu_button.dart';
@@ -75,11 +76,14 @@ class _TrackingPageState extends State<TrackingPage> {
                                   ),
                                 _WeeklyOverview(controller: widget.controller),
                                 const SizedBox(height: 8),
-                                IndicatorCard(
-                                  records: widget.controller.records,
+                                ResponsivePair(
+                                  first: IndicatorCard(
+                                    records: widget.controller.records,
+                                  ),
+                                  second: ScoresCard(
+                                    records: widget.controller.records,
+                                  ),
                                 ),
-                                const SizedBox(height: 12),
-                                ScoresCard(records: widget.controller.records),
                               ] else ...[
                                 if (widget.controller.errors['scales'] != null)
                                   ErrorNotice(

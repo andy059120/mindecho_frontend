@@ -11,6 +11,7 @@ import '../../shared/system_symbol.dart';
 import '../../shared/swift_detail_navigation_bar.dart';
 import '../../shared/widgets.dart';
 import '../auth/auth_widgets.dart';
+import '../auth/privacy_page.dart';
 import '../dashboard/controller.dart';
 import '../dashboard/widgets.dart';
 import 'treasure_page.dart';
@@ -226,6 +227,26 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   const SizedBox(height: 24),
+                  const SizedBox(height: 24),
+                  MindCard(
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () => showPrivacy(context),
+                      child: const Row(
+                        children: [
+                          Icon(CupertinoIcons.shield, color: AppColors.orange),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '隱私政策與使用聲明',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          Icon(CupertinoIcons.chevron_right, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   const Text('時光寶盒', style: headingStyle),
                   const SizedBox(height: 16),

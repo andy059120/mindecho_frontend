@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../core/network/api_client.dart';
 import '../../shared/system_symbol.dart';
 import 'auth_controller.dart';
@@ -124,89 +125,96 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
       ),
       child: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            controller: widget.scrollController,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
-                child: IntrinsicHeight(
-                  child: Column(
-                    children: [
-                      SystemSymbol(
-                        _resetStep ? 'lock.rotation' : 'key.fill',
-                        size: 60,
-                        color: AppColors.orange,
-                        fallback: CupertinoIcons.lock_fill,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _resetStep ? '設定新密碼' : '重置密碼',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontFamily: 'CupertinoSystemDisplay',
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.darkBrown,
+        child: WebContentFrame(
+          maxWidth: 560,
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              controller: widget.scrollController,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        SystemSymbol(
+                          _resetStep ? 'lock.rotation' : 'key.fill',
+                          size: 60,
+                          color: AppColors.orange,
+                          fallback: CupertinoIcons.lock_fill,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          _resetStep
-                              ? '請輸入新的密碼並再次確認，送出後會返回登入主畫面'
-                              : '請先輸入您的姓名與電子郵件，我們會帶您進入設定新密碼頁面',
-                          textAlign: TextAlign.center,
+                        const SizedBox(height: 16),
+                        Text(
+                          _resetStep ? '設定新密碼' : '重置密碼',
                           style: const TextStyle(
-                            height: 1.2,
-                            fontSize: 16,
-                            color: AppColors.mediumBrown,
+                            fontSize: 24,
+                            fontFamily: 'CupertinoSystemDisplay',
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.darkBrown,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      if (!_resetStep) ...[
-                        AuthField('姓名', controller: _name),
-                        const SizedBox(height: 20),
-                        AuthField(
-                          '電子郵件',
-                          controller: _email,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                      ] else ...[
-                        AuthField(
-                          '新密碼',
-                          controller: _password,
-                          secure: true,
-                          showStrength: true,
-                        ),
-                        const SizedBox(height: 20),
-                        AuthField('確認新密碼', controller: _confirm, secure: true),
-                      ],
-                      if (_error != null)
+                        const SizedBox(height: 16),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Text(
-                            _error!,
+                            _resetStep
+                                ? '請輸入新的密碼並再次確認，送出後會返回登入主畫面'
+                                : '請先輸入您的姓名與電子郵件，我們會帶您進入設定新密碼頁面',
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: CupertinoColors.systemRed,
+                              height: 1.2,
+                              fontSize: 16,
+                              color: AppColors.mediumBrown,
                             ),
                           ),
                         ),
-                      const SizedBox(height: 20),
-                      AuthAction(
-                        _resetStep ? '完成重設' : '下一步',
-                        busy: _busy,
-                        onPressed: _canProceed ? _next : null,
-                      ),
-                      const Spacer(),
-                      if (!_resetStep)
-                        CupertinoButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('返回登入'),
+                        const SizedBox(height: 24),
+                        if (!_resetStep) ...[
+                          AuthField('姓名', controller: _name),
+                          const SizedBox(height: 20),
+                          AuthField(
+                            '電子郵件',
+                            controller: _email,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                        ] else ...[
+                          AuthField(
+                            '新密碼',
+                            controller: _password,
+                            secure: true,
+                            showStrength: true,
+                          ),
+                          const SizedBox(height: 20),
+                          AuthField(
+                            '確認新密碼',
+                            controller: _confirm,
+                            secure: true,
+                          ),
+                        ],
+                        if (_error != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Text(
+                              _error!,
+                              style: const TextStyle(
+                                color: CupertinoColors.systemRed,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+                        AuthAction(
+                          _resetStep ? '完成重設' : '下一步',
+                          busy: _busy,
+                          onPressed: _canProceed ? _next : null,
                         ),
-                    ],
+                        const Spacer(),
+                        if (!_resetStep)
+                          CupertinoButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('返回登入'),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

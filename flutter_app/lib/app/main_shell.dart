@@ -2,6 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 
+import 'theme.dart';
+import '../shared/responsive_layout.dart';
+import '../features/auth/auth_widgets.dart';
+import '../features/auth/privacy_page.dart';
+
 import '../core/platform/local_media_store.dart';
 import '../core/platform/media_picker.dart';
 import '../shared/widgets.dart';
@@ -101,6 +106,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final wide = WebLayout.wide(context);
     final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
     return PopScope(
       canPop: _tour == null,
@@ -110,152 +116,174 @@ class _MainShellState extends State<MainShell> {
       child: CupertinoPageScaffold(
         child: Stack(
           children: [
-            Column(
+            Row(
               children: [
-                if (_mediaError != null)
-                  SafeArea(
-                    bottom: false,
-                    child: ErrorNotice(_mediaError!, onRetry: _recoverMedia),
-                  ),
+                if (wide) _sidebar(),
                 Expanded(
-                  child: _recoveringMedia
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : Stack(
-                          children: [
-                            IndexedStack(
-                              index: _tab,
-                              children: [
-                                for (var i = 0; i < 4; i++)
-                                  TickerMode(
-                                    enabled: i == _tab && _tour == null,
-                                    child: CupertinoTabView(
-                                      navigatorKey: _navigatorKeys[i],
-                                      builder: (context) => switch (i) {
-                                        0 => HomePage(
-                                          controller: _controller,
-                                          store: _store,
-                                          media: _media,
-                                          catalog: widget.catalog,
-                                          onTour: () =>
-                                              setState(() => _tour = 0),
-                                        ),
-                                        1 => ChatListPage(
-                                          auth: widget.auth,
-                                          content: widget.content,
-                                          embedded: true,
-                                        ),
-                                        2 => TrackingPage(
-                                          controller: _controller,
-                                          store: _store,
-                                        ),
-                                        _ => ProfilePage(
-                                          controller: _controller,
-                                          media: _media,
-                                        ),
-                                      },
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                ),
-                if (!(_tab == 1 && keyboard))
-                  ClipRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: CupertinoColors.systemBackground.withValues(
-                            alpha: .8,
-                          ),
-                          border: const Border(
-                            top: BorderSide(
-                              color: CupertinoColors.separator,
-                              width: .5,
-                            ),
+                  child: Column(
+                    children: [
+                      if (_mediaError != null)
+                        SafeArea(
+                          bottom: false,
+                          child: ErrorNotice(
+                            _mediaError!,
+                            onRetry: _recoverMedia,
                           ),
                         ),
-                        child: SafeArea(
-                          top: false,
-                          child: SizedBox(
-                            height: 70,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                              ),
-                              child: Row(
-                                children: [
-                                  for (var i = 0; i < 4; i++)
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 8,
-                                        ),
-                                        child: CupertinoButton(
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () =>
-                                              setState(() => _tab = i),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 200,
-                                            ),
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              color: _tab == i
-                                                  ? CupertinoColors.systemOrange
-                                                        .withValues(alpha: .15)
-                                                  : null,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SystemSymbol(
-                                                  _tabs[i].$2,
-                                                  size: 15,
-                                                  weight: 'semibold',
-                                                  color: _tab == i
-                                                      ? CupertinoColors
-                                                            .systemOrange
-                                                      : CupertinoColors
-                                                            .secondaryLabel,
-                                                  fallback: _tabs[i].$3,
+                      Expanded(
+                        child: WebContentFrame(
+                          maxWidth: 1120,
+                          child: _recoveringMedia
+                              ? const Center(
+                                  child: CupertinoActivityIndicator(),
+                                )
+                              : Stack(
+                                  children: [
+                                    IndexedStack(
+                                      index: _tab,
+                                      children: [
+                                        for (var i = 0; i < 4; i++)
+                                          TickerMode(
+                                            enabled: i == _tab && _tour == null,
+                                            child: CupertinoTabView(
+                                              navigatorKey: _navigatorKeys[i],
+                                              builder: (context) => switch (i) {
+                                                0 => HomePage(
+                                                  controller: _controller,
+                                                  store: _store,
+                                                  media: _media,
+                                                  catalog: widget.catalog,
+                                                  onTour: () =>
+                                                      setState(() => _tour = 0),
                                                 ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  _tabs[i].$1,
-                                                  style: TextStyle(
-                                                    fontSize: 13,
+                                                1 => ChatListPage(
+                                                  auth: widget.auth,
+                                                  content: widget.content,
+                                                  embedded: true,
+                                                ),
+                                                2 => TrackingPage(
+                                                  controller: _controller,
+                                                  store: _store,
+                                                ),
+                                                _ => ProfilePage(
+                                                  controller: _controller,
+                                                  media: _media,
+                                                ),
+                                              },
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      if (!wide && !(_tab == 1 && keyboard))
+                        ClipRect(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: CupertinoColors.systemBackground
+                                    .withValues(alpha: .8),
+                                border: const Border(
+                                  top: BorderSide(
+                                    color: CupertinoColors.separator,
+                                    width: .5,
+                                  ),
+                                ),
+                              ),
+                              child: SafeArea(
+                                top: false,
+                                child: SizedBox(
+                                  height: 70,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        for (var i = 0; i < 4; i++)
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 8,
+                                                  ),
+                                              child: CupertinoButton(
+                                                padding: EdgeInsets.zero,
+                                                onPressed: () =>
+                                                    setState(() => _tab = i),
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(
+                                                    milliseconds: 200,
+                                                  ),
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
                                                     color: _tab == i
                                                         ? CupertinoColors
                                                               .systemOrange
-                                                        : CupertinoColors
-                                                              .secondaryLabel,
+                                                              .withValues(
+                                                                alpha: .15,
+                                                              )
+                                                        : null,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      SystemSymbol(
+                                                        _tabs[i].$2,
+                                                        size: 15,
+                                                        weight: 'semibold',
+                                                        color: _tab == i
+                                                            ? CupertinoColors
+                                                                  .systemOrange
+                                                            : CupertinoColors
+                                                                  .secondaryLabel,
+                                                        fallback: _tabs[i].$3,
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        _tabs[i].$1,
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: _tab == i
+                                                              ? CupertinoColors
+                                                                    .systemOrange
+                                                              : CupertinoColors
+                                                                    .secondaryLabel,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                    ],
                   ),
+                ),
               ],
             ),
             if (_tour != null)
               Positioned.fill(
                 child: TabTourOverlay(
+                  sidebar: wide,
                   index: _tour!,
                   title: _tabs[_tour!].$1,
                   message: _tourText[_tour!],
@@ -269,6 +297,117 @@ class _MainShellState extends State<MainShell> {
       ),
     );
   }
+
+  Widget _sidebar() => Container(
+    width: WebLayout.sidebarWidth,
+    decoration: BoxDecoration(
+      color: CupertinoColors.white.withValues(alpha: .8),
+      border: Border(
+        right: BorderSide(color: AppColors.lightBrown.withValues(alpha: .18)),
+      ),
+    ),
+    child: SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 32),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: AuthBrand(size: 23, iconSize: 23),
+                  ),
+                  const SizedBox(height: 32),
+                  for (var i = 0; i < _tabs.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                      child: Semantics(
+                        selected: _tab == i,
+                        child: CupertinoButton(
+                          color: _tab == i
+                              ? AppColors.orange.withValues(alpha: .12)
+                              : null,
+                          borderRadius: BorderRadius.circular(14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          onPressed: () => setState(() => _tab = i),
+                          child: Row(
+                            children: [
+                              SystemSymbol(
+                                _tabs[i].$2,
+                                size: 20,
+                                fallback: _tabs[i].$3,
+                                color: _tab == i
+                                    ? AppColors.orange
+                                    : AppColors.mediumBrown,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _tabs[i].$1,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: _tab == i
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                    color: _tab == i
+                                        ? AppColors.orange
+                                        : AppColors.mediumBrown,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '給自己一點時間',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.darkBrown,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          '陪伴、記錄，慢慢前進。',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.mediumBrown,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () => showPrivacy(context),
+                          child: const Text(
+                            '隱私政策',
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 const _tabs = [

@@ -71,17 +71,8 @@ class _MindEchoAppState extends State<MindEchoApp> {
       title: 'PsychEcho',
       debugShowCheckedModeBanner: false,
       theme: appTheme,
-      builder: (context, child) => kIsWeb
-          ? ColoredBox(
-              color: const Color(0xFFF3F0EC),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 520),
-                  child: child!,
-                ),
-              ),
-            )
-          : defaultTargetPlatform == TargetPlatform.android
+      builder: (context, child) =>
+          !kIsWeb && defaultTargetPlatform == TargetPlatform.android
           ? AnnotatedRegion<SystemUiOverlayStyle>(
               value: SystemUiOverlayStyle.dark.copyWith(
                 statusBarColor: const Color(0x00000000),
@@ -103,7 +94,10 @@ class _MindEchoAppState extends State<MindEchoApp> {
           countryCode: 'TW',
         ),
       ],
-      localizationsDelegates: GlobalCupertinoLocalizations.delegates,
+      localizationsDelegates: const [
+        ...GlobalCupertinoLocalizations.delegates,
+        GlobalMaterialLocalizations.delegate,
+      ],
       home: _error != null
           ? CupertinoPageScaffold(
               child: Center(child: ErrorNotice(_error!, onRetry: _initialize)),

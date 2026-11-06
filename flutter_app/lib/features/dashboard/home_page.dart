@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../core/platform/local_media_store.dart';
 import '../../core/storage/account_store.dart';
 import '../../shared/system_symbol.dart';
@@ -58,8 +59,13 @@ class HomePage extends StatelessWidget {
                     padding: EdgeInsets.all(8),
                     child: CupertinoActivityIndicator(),
                   ),
-                _padding(IndicatorCard(records: controller.records), top: 8),
-                _padding(ScoresCard(records: controller.records), top: 12),
+                _padding(
+                  ResponsivePair(
+                    first: IndicatorCard(records: controller.records),
+                    second: ScoresCard(records: controller.records),
+                  ),
+                  top: 8,
+                ),
                 _padding(QuoteCard(quotes: catalog.quotes), top: 16),
                 if (!controller.completedToday)
                   _padding(
@@ -107,21 +113,16 @@ class HomePage extends StatelessWidget {
                 _section('進一步瞭解自己'),
                 _padding(TestGuide(meta: catalog.scales.firstOrNull), top: 12),
                 const SizedBox(height: 12),
-                SizedBox(
-                  height: 180,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: catalog.scales.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 16),
-                    itemBuilder: (context, index) {
-                      final meta = catalog.scales[index];
-                      return _ScaleTile(
-                        meta: meta,
-                        onTap: () => showScale(context, meta, controller),
-                      );
-                    },
-                  ),
+                ResponsiveShelf(
+                  itemHeight: 180,
+                  itemCount: catalog.scales.length,
+                  itemBuilder: (context, index) {
+                    final meta = catalog.scales[index];
+                    return _ScaleTile(
+                      meta: meta,
+                      onTap: () => showScale(context, meta, controller),
+                    );
+                  },
                 ),
                 const SizedBox(height: 20),
                 _section('我的重要時刻'),

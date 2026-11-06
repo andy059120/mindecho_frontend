@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 
+import 'responsive_layout.dart';
+
 class TabTourOverlay extends StatelessWidget {
   const TabTourOverlay({
     required this.index,
@@ -9,8 +11,10 @@ class TabTourOverlay extends StatelessWidget {
     required this.message,
     required this.onNext,
     required this.onClose,
+    this.sidebar = false,
     super.key,
   });
+  final bool sidebar;
   final int index;
   final String title, message;
   final VoidCallback onNext, onClose;
@@ -19,12 +23,19 @@ class TabTourOverlay extends StatelessWidget {
     builder: (context, constraints) {
       final bottom = MediaQuery.paddingOf(context).bottom;
       final itemWidth = (constraints.maxWidth - 60) / 4;
-      final rect = Rect.fromLTWH(
-        6 + index * (itemWidth + 12),
-        constraints.maxHeight - bottom - 68,
-        itemWidth + 12,
-        66,
-      );
+      final rect = sidebar
+          ? Rect.fromLTWH(
+              12,
+              MediaQuery.paddingOf(context).top + 92 + index * 60,
+              WebLayout.sidebarWidth - 24,
+              52,
+            )
+          : Rect.fromLTWH(
+              6 + index * (itemWidth + 12),
+              constraints.maxHeight - bottom - 68,
+              itemWidth + 12,
+              66,
+            );
       final width = math.min(260.0, constraints.maxWidth - 32);
       final left = (rect.center.dx - width / 2).clamp(
         8.0,
@@ -47,8 +58,9 @@ class TabTourOverlay extends StatelessWidget {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            left: left,
-            bottom: bottom + 96,
+            left: sidebar ? WebLayout.sidebarWidth + 16 : left,
+            top: sidebar ? rect.top : null,
+            bottom: sidebar ? null : bottom + 96,
             width: width,
             child: Container(
               padding: const EdgeInsets.all(12),
