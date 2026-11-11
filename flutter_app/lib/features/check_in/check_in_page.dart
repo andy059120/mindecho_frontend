@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../auth/auth_widgets.dart';
 import '../dashboard/controller.dart';
 import '../dashboard/models.dart';
@@ -80,20 +81,23 @@ class _CheckInPageState extends State<CheckInPage> {
               ),
             ),
           ),
-    child: SafeArea(
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  children: _done
-                      ? _result()
-                      : _question < 0
-                      ? _intro()
-                      : _questionView(),
+    child: ContentFrame(
+      maxWidth: 760,
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: _done
+                        ? _result()
+                        : _question < 0
+                        ? _intro()
+                        : _questionView(),
+                  ),
                 ),
               ),
             ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../core/storage/account_store.dart';
 import '../../shared/widgets.dart';
 import '../../shared/system_symbol.dart';
@@ -31,23 +32,26 @@ class _DiaryPageState extends State<DiaryPage> {
     CupertinoPageRoute<void>(
       builder: (_) => CupertinoPageScaffold(
         navigationBar: const CupertinoNavigationBar(middle: Text('日記歷史')),
-        child: SafeArea(
-          child: ListView(
-            children: [
-              for (final e in widget.controller.diaryEntries)
-                CupertinoListTile(
-                  title: Text('${dayKey(e.date)} ${moodFor(e.mood).emoji}'),
-                  subtitle: Text(
-                    e.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+        child: ContentFrame(
+          maxWidth: 760,
+          child: SafeArea(
+            child: ListView(
+              children: [
+                for (final e in widget.controller.diaryEntries)
+                  CupertinoListTile(
+                    title: Text('${dayKey(e.date)} ${moodFor(e.mood).emoji}'),
+                    subtitle: Text(
+                      e.content,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () {
+                      setState(() => _selected = calendarDay(e.date));
+                      Navigator.pop(context);
+                    },
                   ),
-                  onTap: () {
-                    setState(() => _selected = calendarDay(e.date));
-                    Navigator.pop(context);
-                  },
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

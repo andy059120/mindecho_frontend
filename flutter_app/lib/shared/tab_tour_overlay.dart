@@ -22,16 +22,21 @@ class TabTourOverlay extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final bottom = MediaQuery.paddingOf(context).bottom;
-      final itemWidth = (constraints.maxWidth - 60) / 4;
+      final navigationWidth = math.min(
+        constraints.maxWidth,
+        ResponsiveLayout.bottomNavigationMaxWidth,
+      );
+      final navigationLeft = (constraints.maxWidth - navigationWidth) / 2;
+      final itemWidth = (navigationWidth - 60) / 4;
       final rect = sidebar
           ? Rect.fromLTWH(
               12,
               MediaQuery.paddingOf(context).top + 92 + index * 60,
-              WebLayout.sidebarWidth - 24,
+              ResponsiveLayout.sidebarWidth - 24,
               52,
             )
           : Rect.fromLTWH(
-              6 + index * (itemWidth + 12),
+              navigationLeft + 6 + index * (itemWidth + 12),
               constraints.maxHeight - bottom - 68,
               itemWidth + 12,
               66,
@@ -58,7 +63,7 @@ class TabTourOverlay extends StatelessWidget {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            left: sidebar ? WebLayout.sidebarWidth + 16 : left,
+            left: sidebar ? ResponsiveLayout.sidebarWidth + 16 : left,
             top: sidebar ? rect.top : null,
             bottom: sidebar ? null : bottom + 96,
             width: width,

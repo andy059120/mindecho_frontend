@@ -106,7 +106,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final wide = WebLayout.wide(context);
+    final wide = ResponsiveLayout.useSidebar(context);
     final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
     return PopScope(
       canPop: _tour == null,
@@ -131,8 +131,8 @@ class _MainShellState extends State<MainShell> {
                           ),
                         ),
                       Expanded(
-                        child: WebContentFrame(
-                          maxWidth: 1120,
+                        child: ContentFrame(
+                          maxWidth: ResponsiveLayout.dashboardMaxWidth,
                           child: _recoveringMedia
                               ? const Center(
                                   child: CupertinoActivityIndicator(),
@@ -147,29 +147,39 @@ class _MainShellState extends State<MainShell> {
                                             enabled: i == _tab && _tour == null,
                                             child: CupertinoTabView(
                                               navigatorKey: _navigatorKeys[i],
-                                              builder: (context) => switch (i) {
-                                                0 => HomePage(
-                                                  controller: _controller,
-                                                  store: _store,
-                                                  media: _media,
-                                                  catalog: widget.catalog,
-                                                  onTour: () =>
-                                                      setState(() => _tour = 0),
+                                              builder: (context) => ContentFrame(
+                                                maxWidth:
+                                                    (i == 1 || i == 3) && wide
+                                                    ? 760
+                                                    : ResponsiveLayout
+                                                          .dashboardMaxWidth,
+                                                child: ResponsivePage(
+                                                  child: switch (i) {
+                                                    0 => HomePage(
+                                                      controller: _controller,
+                                                      store: _store,
+                                                      media: _media,
+                                                      catalog: widget.catalog,
+                                                      onTour: () => setState(
+                                                        () => _tour = 0,
+                                                      ),
+                                                    ),
+                                                    1 => ChatListPage(
+                                                      auth: widget.auth,
+                                                      content: widget.content,
+                                                      embedded: true,
+                                                    ),
+                                                    2 => TrackingPage(
+                                                      controller: _controller,
+                                                      store: _store,
+                                                    ),
+                                                    _ => ProfilePage(
+                                                      controller: _controller,
+                                                      media: _media,
+                                                    ),
+                                                  },
                                                 ),
-                                                1 => ChatListPage(
-                                                  auth: widget.auth,
-                                                  content: widget.content,
-                                                  embedded: true,
-                                                ),
-                                                2 => TrackingPage(
-                                                  controller: _controller,
-                                                  store: _store,
-                                                ),
-                                                _ => ProfilePage(
-                                                  controller: _controller,
-                                                  media: _media,
-                                                ),
-                                              },
+                                              ),
                                             ),
                                           ),
                                       ],
@@ -195,79 +205,85 @@ class _MainShellState extends State<MainShell> {
                               ),
                               child: SafeArea(
                                 top: false,
-                                child: SizedBox(
-                                  height: 70,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        for (var i = 0; i < 4; i++)
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 6,
-                                                    vertical: 8,
-                                                  ),
-                                              child: CupertinoButton(
-                                                padding: EdgeInsets.zero,
-                                                onPressed: () =>
-                                                    setState(() => _tab = i),
-                                                child: AnimatedContainer(
-                                                  duration: const Duration(
-                                                    milliseconds: 200,
-                                                  ),
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: _tab == i
-                                                        ? CupertinoColors
-                                                              .systemOrange
-                                                              .withValues(
-                                                                alpha: .15,
-                                                              )
-                                                        : null,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SystemSymbol(
-                                                        _tabs[i].$2,
-                                                        size: 15,
-                                                        weight: 'semibold',
-                                                        color: _tab == i
-                                                            ? CupertinoColors
-                                                                  .systemOrange
-                                                            : CupertinoColors
-                                                                  .secondaryLabel,
-                                                        fallback: _tabs[i].$3,
-                                                      ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        _tabs[i].$1,
-                                                        style: TextStyle(
-                                                          fontSize: 13,
+                                child: ContentFrame(
+                                  maxWidth:
+                                      ResponsiveLayout.bottomNavigationMaxWidth,
+                                  child: SizedBox(
+                                    height: 70,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          for (var i = 0; i < 4; i++)
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 8,
+                                                    ),
+                                                child: CupertinoButton(
+                                                  padding: EdgeInsets.zero,
+                                                  onPressed: () =>
+                                                      setState(() => _tab = i),
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(
+                                                      milliseconds: 200,
+                                                    ),
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color: _tab == i
+                                                          ? CupertinoColors
+                                                                .systemOrange
+                                                                .withValues(
+                                                                  alpha: .15,
+                                                                )
+                                                          : null,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        SystemSymbol(
+                                                          _tabs[i].$2,
+                                                          size: 15,
+                                                          weight: 'semibold',
                                                           color: _tab == i
                                                               ? CupertinoColors
                                                                     .systemOrange
                                                               : CupertinoColors
                                                                     .secondaryLabel,
+                                                          fallback: _tabs[i].$3,
                                                         ),
-                                                      ),
-                                                    ],
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
+                                                        Text(
+                                                          _tabs[i].$1,
+                                                          style: TextStyle(
+                                                            fontSize: 13,
+                                                            color: _tab == i
+                                                                ? CupertinoColors
+                                                                      .systemOrange
+                                                                : CupertinoColors
+                                                                      .secondaryLabel,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -299,7 +315,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   Widget _sidebar() => Container(
-    width: WebLayout.sidebarWidth,
+    width: ResponsiveLayout.sidebarWidth,
     decoration: BoxDecoration(
       color: CupertinoColors.white.withValues(alpha: .8),
       border: Border(

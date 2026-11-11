@@ -176,59 +176,61 @@ class _WelcomePageState extends State<WelcomePage>
                             curve: Curves.easeOut,
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              AuthAction('立即登入', onPressed: _login),
-                              const SizedBox(height: 20),
-                              AuthAction(
-                                '建立新帳號',
-                                onPressed: _register,
-                                textOnly: true,
-                                height: 48,
-                                fontSize: 16,
-                              ),
-                              const SizedBox(height: 20),
-                              Opacity(
-                                opacity: 0.7,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      '繼續即表示您同意我們的',
-                                      style: TextStyle(
-                                        height: 1.2,
-                                        fontSize: 12,
-                                        color: AppColors.mediumBrown.withValues(
-                                          alpha: 0.7,
+                        child: ContentFrame(
+                          maxWidth: 560,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AuthAction('立即登入', onPressed: _login),
+                                const SizedBox(height: 20),
+                                AuthAction(
+                                  '建立新帳號',
+                                  onPressed: _register,
+                                  textOnly: true,
+                                  height: 48,
+                                  fontSize: 16,
+                                ),
+                                const SizedBox(height: 20),
+                                Opacity(
+                                  opacity: 0.7,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        '繼續即表示您同意我們的',
+                                        style: TextStyle(
+                                          height: 1.2,
+                                          fontSize: 12,
+                                          color: AppColors.mediumBrown
+                                              .withValues(alpha: 0.7),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        _legalButton(context, '服務條款'),
-                                        const SizedBox(width: 16),
-                                        Text(
-                                          '和',
-                                          style: TextStyle(
-                                            height: 1.2,
-                                            fontSize: 12,
-                                            color: AppColors.mediumBrown
-                                                .withValues(alpha: 0.7),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          _legalButton(context, '服務條款'),
+                                          const SizedBox(width: 16),
+                                          Text(
+                                            '和',
+                                            style: TextStyle(
+                                              height: 1.2,
+                                              fontSize: 12,
+                                              color: AppColors.mediumBrown
+                                                  .withValues(alpha: 0.7),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        _legalButton(context, '隱私政策'),
-                                      ],
-                                    ),
-                                  ],
+                                          const SizedBox(width: 16),
+                                          _legalButton(context, '隱私政策'),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -237,7 +239,7 @@ class _WelcomePageState extends State<WelcomePage>
                 ],
               ),
             );
-            if (WebLayout.wide(context)) {
+            if (ResponsiveLayout.useSidebar(context)) {
               return Row(
                 children: [
                   Expanded(
@@ -284,7 +286,7 @@ class _WelcomePageState extends State<WelcomePage>
                     ),
                   ),
                   Expanded(
-                    child: WebContentFrame(
+                    child: ContentFrame(
                       maxWidth: 520,
                       child: SingleChildScrollView(child: body),
                     ),
@@ -292,8 +294,8 @@ class _WelcomePageState extends State<WelcomePage>
                 ],
               );
             }
-            return WebContentFrame(
-              maxWidth: 600,
+            return ContentFrame(
+              maxWidth: double.infinity,
               child: height > constraints.maxHeight
                   ? SingleChildScrollView(child: body)
                   : body,
@@ -375,8 +377,8 @@ class _WelcomeSlide extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: WebLayout.wide(context) ? 180 : 240,
-              height: WebLayout.wide(context) ? 180 : 240,
+              width: ResponsiveLayout.useSidebar(context) ? 180 : 240,
+              height: ResponsiveLayout.useSidebar(context) ? 180 : 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
@@ -409,14 +411,17 @@ class _WelcomeSlide extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              slide.description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.mediumBrown,
-                height: 1.45,
+            ContentFrame(
+              maxWidth: 720,
+              child: Text(
+                slide.description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.mediumBrown,
+                  height: 1.6,
+                ),
               ),
             ),
           ],

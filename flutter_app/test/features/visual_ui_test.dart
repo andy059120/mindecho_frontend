@@ -25,6 +25,9 @@ void main() {
     const Size(320, 568),
     const Size(402, 874),
     const Size(440, 956),
+    const Size(1032, 1376),
+    const Size(1376, 1032),
+    const Size(507, 1032),
   ]) {
     testWidgets('彈出頁面 ${size.width}：介紹、資源、量表與日記無溢位，不送出資料', (tester) async {
       tester.view.physicalSize = size;

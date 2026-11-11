@@ -125,7 +125,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
       ),
       child: SafeArea(
-        child: WebContentFrame(
+        child: ContentFrame(
           maxWidth: 560,
           child: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(

@@ -128,7 +128,13 @@ class HomePage extends StatelessWidget {
                 _section('我的重要時刻'),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 140,
+                  height:
+                      140 +
+                      (MediaQuery.textScalerOf(context).scale(16) - 16).clamp(
+                            0.0,
+                            32.0,
+                          ) *
+                          8,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -145,49 +151,43 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 20),
                 _section('求助資源'),
                 const SizedBox(height: 12),
-                SizedBox(
-                  height: 140,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      for (final resource in [
-                        (
-                          'hotline',
-                          '24 小時求助資源',
-                          '查看心理諮詢熱線、免費協談專線與其他求助管道',
-                          'phone.connection.fill',
-                          '查看資源',
-                        ),
-                        (
-                          'techniques',
-                          '情緒管理小技巧',
-                          '如果感到難受或焦慮，你可以試著這樣做......',
-                          'heart.circle.fill',
-                          '查看更多',
-                        ),
-                        (
-                          'relax',
-                          '放鬆訓練',
-                          '透過呼吸與冥想，幫助自己慢慢穩定下來',
-                          'leaf.fill',
-                          '開始練習',
-                        ),
-                      ])
-                        Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: _ResourceTile(
-                            title: resource.$2,
-                            subtitle: resource.$3,
-                            symbol: resource.$4,
-                            button: resource.$5,
-                            color: const Color(0xFFFAE6B3),
-                            onTap: () =>
-                                showResource(context, resource.$1, catalog),
-                          ),
-                        ),
-                    ],
-                  ),
+                ResponsiveShelf(
+                  itemHeight: 140,
+                  maxItemWidth: 400,
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    final resource = [
+                      (
+                        'hotline',
+                        '24 小時求助資源',
+                        '查看心理諮詢熱線、免費協談專線與其他求助管道',
+                        'phone.connection.fill',
+                        '查看資源',
+                      ),
+                      (
+                        'techniques',
+                        '情緒管理小技巧',
+                        '如果感到難受或焦慮，你可以試著這樣做......',
+                        'heart.circle.fill',
+                        '查看更多',
+                      ),
+                      (
+                        'relax',
+                        '放鬆訓練',
+                        '透過呼吸與冥想，幫助自己慢慢穩定下來',
+                        'leaf.fill',
+                        '開始練習',
+                      ),
+                    ][index];
+                    return _ResourceTile(
+                      title: resource.$2,
+                      subtitle: resource.$3,
+                      symbol: resource.$4,
+                      button: resource.$5,
+                      color: const Color(0xFFFAE6B3),
+                      onTap: () => showResource(context, resource.$1, catalog),
+                    );
+                  },
                 ),
                 _padding(
                   DiaryEditor(
@@ -318,78 +318,99 @@ class _ScaleTile extends StatelessWidget {
   final Map<String, dynamic> meta;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Container(
-    width: 160,
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFFAF0CC), Color(0xFFF2E08C), Color(0xFFF4E6A3)],
-      ),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SystemSymbol(
-          meta['icon'] as String,
-          size: 22,
-          color: AppColors.darkBrown,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => Container(
+      width: 160,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFAF0CC), Color(0xFFF2E08C), Color(0xFFF4E6A3)],
         ),
-        const SizedBox(height: 6),
-        Text(
-          meta['title'] as String,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SystemSymbol(
+            meta['icon'] as String,
+            size: 22,
             color: AppColors.darkBrown,
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          meta['subtitle'] as String,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 11, color: AppColors.darkBrown),
-        ),
-        const Spacer(),
-        Row(
-          children: [
-            const SystemSymbol(
-              'clock',
-              size: 8,
+          const SizedBox(height: 6),
+          Text(
+            meta['title'] as String,
+            maxLines: constraints.hasBoundedWidth && constraints.maxWidth >= 200
+                ? 2
+                : 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
               color: AppColors.darkBrown,
-              fallback: CupertinoIcons.clock,
             ),
-            const SizedBox(width: 4),
-            Text(
-              '${(meta['count'] / 2).ceil()}分鐘',
-              style: const TextStyle(fontSize: 10, color: AppColors.darkBrown),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Row(
-          children: [
-            const SystemSymbol(
-              'questionmark.circle',
-              size: 8,
-              color: AppColors.darkBrown,
-              fallback: CupertinoIcons.question_circle,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '${meta['count']}題',
-              style: const TextStyle(fontSize: 10, color: AppColors.darkBrown),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        AuthAction('開始測驗', height: 30, fontSize: 11, onPressed: onTap),
-      ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            meta['subtitle'] as String,
+            maxLines: constraints.hasBoundedWidth && constraints.maxWidth >= 200
+                ? 2
+                : 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 11, color: AppColors.darkBrown),
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              const SystemSymbol(
+                'clock',
+                size: 8,
+                color: AppColors.darkBrown,
+                fallback: CupertinoIcons.clock,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${(meta['count'] / 2).ceil()}分鐘',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: AppColors.darkBrown,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              const SystemSymbol(
+                'questionmark.circle',
+                size: 8,
+                color: AppColors.darkBrown,
+                fallback: CupertinoIcons.question_circle,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${meta['count']}題',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: AppColors.darkBrown,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          AuthAction(
+            '開始測驗',
+            height: constraints.hasBoundedWidth && constraints.maxWidth >= 200
+                ? 44
+                : 30,
+            fontSize: constraints.hasBoundedWidth && constraints.maxWidth >= 200
+                ? 13
+                : 11,
+            onPressed: onTap,
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -407,82 +428,94 @@ class _ResourceTile extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => SizedBox(
-    width: 160,
-    child: CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: button == '前往查看'
-                ? [color, const Color(0xFFF2A659), const Color(0xFFE9975C)]
-                : [
-                    Color.alphaBlend(
-                      color.withValues(alpha: .6),
-                      AppColors.lightYellow,
-                    ),
-                    Color.alphaBlend(
-                      const Color(0xFFF2A659).withValues(alpha: .6),
-                      AppColors.lightYellow,
-                    ),
-                    Color.alphaBlend(
-                      AppColors.orange.withValues(alpha: .6),
-                      AppColors.lightYellow,
-                    ),
-                  ],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => SizedBox(
+      width: 160,
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        onPressed: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: button == '前往查看'
+                  ? [color, const Color(0xFFF2A659), const Color(0xFFE9975C)]
+                  : [
+                      Color.alphaBlend(
+                        color.withValues(alpha: .6),
+                        AppColors.lightYellow,
+                      ),
+                      Color.alphaBlend(
+                        const Color(0xFFF2A659).withValues(alpha: .6),
+                        AppColors.lightYellow,
+                      ),
+                      Color.alphaBlend(
+                        AppColors.orange.withValues(alpha: .6),
+                        AppColors.lightYellow,
+                      ),
+                    ],
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SystemSymbol(
-              symbol,
-              size: 22,
-              color: AppColors.darkBrown,
-              fallback: CupertinoIcons.heart_fill,
-            ),
-            const Spacer(),
-            Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SystemSymbol(
+                symbol,
+                size: 22,
                 color: AppColors.darkBrown,
+                fallback: CupertinoIcons.heart_fill,
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.darkBrown.withValues(alpha: .7),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.darkBrown,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                button,
+              const Spacer(),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 11,
-                  color: CupertinoColors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.darkBrown,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                maxLines:
+                    constraints.hasBoundedWidth && constraints.maxWidth >= 220
+                    ? 2
+                    : 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize:
+                      constraints.hasBoundedWidth && constraints.maxWidth >= 220
+                      ? 13
+                      : 11,
+                  height: 1.5,
+                  color: AppColors.darkBrown.withValues(alpha: .7),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.darkBrown,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  button,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),
@@ -595,9 +628,9 @@ class _QuoteCardState extends State<QuoteCard>
     padding: EdgeInsets.zero,
     onPressed: _choose,
     child: Container(
-      height: 296,
+      constraints: const BoxConstraints(minHeight: 248),
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Color.alphaBlend(const Color(0x26FFFF00), AppColors.lightYellow),
         borderRadius: BorderRadius.circular(16),
@@ -610,6 +643,7 @@ class _QuoteCardState extends State<QuoteCard>
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
@@ -690,8 +724,6 @@ class _QuoteCardState extends State<QuoteCard>
             const SizedBox(height: 10),
             Text(
               _selected!['content'] as String,
-              maxLines: 6,
-              overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 15, color: AppColors.title),
             ),
           ],

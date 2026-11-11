@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../dashboard/widgets.dart' show PageHeading;
 import '../../shared/widgets.dart';
+import '../../shared/responsive_layout.dart';
 import '../auth/auth_controller.dart';
 import 'chat_content.dart';
 import 'chat_detail_page.dart';
@@ -143,6 +145,7 @@ class _ChatListPageState extends State<ChatListPage> {
 
   @override
   Widget build(BuildContext context) => CupertinoPageScaffold(
+    resizeToAvoidBottomInset: false,
     navigationBar: widget.embedded
         ? null
         : CupertinoNavigationBar(
@@ -158,57 +161,23 @@ class _ChatListPageState extends State<ChatListPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Column(
-              children: [
-                const Text(
-                  '聊天室',
-                  style: TextStyle(
-                    fontFamily: 'CupertinoSystemDisplay',
-                    fontSize: 22,
-                    height: 1.2,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.title,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '選擇一種對話方式，開始今天的陪伴',
-                  style: TextStyle(
-                    fontSize: 15,
-                    height: 1.2,
-                    color: AppColors.title.withValues(alpha: .7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
-            child: Text(
-              '聊天室',
-              style: TextStyle(
-                fontSize: 20,
-                height: 1.2,
-                fontWeight: FontWeight.bold,
-                color: AppColors.title,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 150,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: ChatMode.values.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, index) => ChatModeTile(
-                mode: ChatMode.values[index],
-                onPressed: _mutating || _loading
-                    ? null
-                    : () => _create(ChatMode.values[index]),
-              ),
+          const PageHeading('聊天室', subtitle: '選擇一種對話方式，開始今天的陪伴'),
+          const SizedBox(height: 8),
+          ResponsiveShelf(
+            allowGrid:
+                MediaQuery.sizeOf(context).height >=
+                700 *
+                    (MediaQuery.textScalerOf(context).scale(16) / 16).clamp(
+                      1.0,
+                      2.0,
+                    ),
+            itemHeight: 164,
+            itemCount: ChatMode.values.length,
+            itemBuilder: (context, index) => ChatModeTile(
+              mode: ChatMode.values[index],
+              onPressed: _mutating || _loading
+                  ? null
+                  : () => _create(ChatMode.values[index]),
             ),
           ),
           const Padding(

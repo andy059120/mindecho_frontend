@@ -56,44 +56,67 @@ class PageHeading extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(20, top, 20, subtitle == null ? 12 : 0),
-    child: Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final spacious = constraints.maxWidth >= 600;
+      final titleWidget = Text(
+        title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontFamily: 'CupertinoSystemDisplay',
+          fontSize: spacious ? 28 : 22,
+          height: 1.25,
+          fontWeight: FontWeight.bold,
+          color: AppColors.title,
+        ),
+      );
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, spacious ? top + 8 : top, 16, 12),
+        child: Column(
+          crossAxisAlignment: spacious
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              width: double.infinity,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'CupertinoSystemDisplay',
-                  fontSize: 22,
-                  height: 1.2,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.title,
+            if (spacious)
+              Row(
+                children: [
+                  Expanded(child: titleWidget),
+                  if (trailing != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: trailing!,
+                    ),
+                ],
+              )
+            else
+              SizedBox(
+                height: math.max(
+                  44,
+                  MediaQuery.textScalerOf(context).scale(22) * 2.5,
+                ),
+                child: NavigationToolbar(
+                  centerMiddle: true,
+                  middle: titleWidget,
+                  trailing: trailing,
                 ),
               ),
-            ),
-            if (trailing != null)
-              Align(alignment: Alignment.centerRight, child: trailing!),
+            if (subtitle != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                subtitle!,
+                textAlign: spacious ? TextAlign.start : TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: AppColors.title.withValues(alpha: .7),
+                ),
+              ),
+            ],
           ],
         ),
-        if (subtitle != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            subtitle!,
-            style: TextStyle(
-              fontSize: 15,
-              height: 1.2,
-              color: AppColors.title.withValues(alpha: .7),
-            ),
-          ),
-        ],
-      ],
-    ),
+      );
+    },
   );
 }
 
@@ -578,27 +601,30 @@ class _IndicatorCardState extends State<IndicatorCard> {
             ],
           ),
           const SizedBox(height: 8),
-          TrendChart(
-            emphasizeSeries: _indicator != '全部',
-            minimum: 1,
-            series: shown,
-            labels: starts
-                .map(
-                  (d) => _period == '最近七月' || _period == '最近三年半'
-                      ? '${d.year}\n${d.month}月'
-                      : _period == '本週'
-                      ? const [
-                          'Mon',
-                          'Tue',
-                          'Wed',
-                          'Thu',
-                          'Fri',
-                          'Sat',
-                          'Sun',
-                        ][d.weekday - 1]
-                      : '${d.month}/${d.day}',
-                )
-                .toList(),
+          LayoutBuilder(
+            builder: (context, constraints) => TrendChart(
+              height: (constraints.maxWidth * .28).clamp(200.0, 320.0),
+              emphasizeSeries: _indicator != '全部',
+              minimum: 1,
+              series: shown,
+              labels: starts
+                  .map(
+                    (d) => _period == '最近七月' || _period == '最近三年半'
+                        ? '${d.year}\n${d.month}月'
+                        : _period == '本週'
+                        ? const [
+                            'Mon',
+                            'Tue',
+                            'Wed',
+                            'Thu',
+                            'Fri',
+                            'Sat',
+                            'Sun',
+                          ][d.weekday - 1]
+                        : '${d.month}/${d.day}',
+                  )
+                  .toList(),
+            ),
           ),
         ],
       ),

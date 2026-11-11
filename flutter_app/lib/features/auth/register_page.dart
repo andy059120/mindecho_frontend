@@ -176,7 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
     child: DecoratedBox(
       decoration: const BoxDecoration(gradient: authGradient),
       child: SafeArea(
-        child: WebContentFrame(
+        child: ContentFrame(
           maxWidth: 560,
           child: LayoutBuilder(
             builder: (context, constraints) => SizedBox(

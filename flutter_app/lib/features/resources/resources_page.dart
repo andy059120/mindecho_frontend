@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../shared/system_symbol.dart';
 import '../dashboard/catalog.dart';
 import '../dashboard/widgets.dart';
@@ -51,16 +52,19 @@ class _ResourcePageState extends State<ResourcePage> {
                 size: 17,
               ),
             ),
-      child: SafeArea(
-        child: relax
-            ? _relax()
-            : ListView(
-                controller: widget.scrollController,
-                padding: const EdgeInsets.all(16),
-                children: widget.kind == 'techniques'
-                    ? _techniques()
-                    : _hotlines(),
-              ),
+      child: ContentFrame(
+        maxWidth: 760,
+        child: SafeArea(
+          child: relax
+              ? _relax()
+              : ListView(
+                  controller: widget.scrollController,
+                  padding: const EdgeInsets.all(16),
+                  children: widget.kind == 'techniques'
+                      ? _techniques()
+                      : _hotlines(),
+                ),
+        ),
       ),
     );
   }

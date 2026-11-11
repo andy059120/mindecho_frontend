@@ -51,68 +51,74 @@ class ChatModeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: 160,
-    height: 150,
     child: CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: onPressed,
-      child: Container(
-        width: 160,
-        height: 150,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFFAE6B3), Color(0xFFF2A659), Color(0xFFE9975C)],
+      child: LayoutBuilder(
+        builder: (context, constraints) => Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFAE6B3), Color(0xFFF2A659), Color(0xFFE9975C)],
+            ),
+            boxShadow: const [
+              BoxShadow(color: Color(0x19000000), blurRadius: 4),
+            ],
           ),
-          boxShadow: const [BoxShadow(color: Color(0x19000000), blurRadius: 4)],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SystemSymbol(
-              mode.symbol,
-              size: 22,
-              color: AppColors.darkBrown,
-              fallback: mode.icon,
-            ),
-            const Spacer(),
-            Text(
-              mode.title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SystemSymbol(
+                mode.symbol,
+                size: 22,
                 color: AppColors.darkBrown,
+                fallback: mode.icon,
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              mode.subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.darkBrown.withValues(alpha: .7),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.darkBrown,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                '開始對話',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: CupertinoColors.white,
+              const Spacer(),
+              Text(
+                mode.title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkBrown,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                mode.subtitle,
+                maxLines: constraints.maxWidth >= 180 ? 2 : 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: constraints.maxWidth >= 180 ? 12 : 11,
+                  height: 1.4,
+                  color: AppColors.darkBrown.withValues(alpha: .7),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.darkBrown,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '開始對話',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),

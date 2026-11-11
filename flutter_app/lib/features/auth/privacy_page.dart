@@ -90,12 +90,12 @@ class _PrivacyPageState extends State<PrivacyPage> {
             return const Center(child: CupertinoActivityIndicator());
           }
           final copy = snapshot.data!;
-          return WebContentFrame(
+          return ContentFrame(
             maxWidth: 1180,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (WebLayout.wide(context))
+                if (ResponsiveLayout.wide(context))
                   SizedBox(
                     width: 260,
                     child: SingleChildScrollView(

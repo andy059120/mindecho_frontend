@@ -3,6 +3,7 @@ import '../../core/network/api_client.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../shared/widgets.dart';
 import 'chat_content.dart';
 import 'chat_models.dart';
@@ -215,367 +216,380 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   @override
   Widget build(BuildContext context) => CupertinoPageScaffold(
     backgroundColor: CupertinoColors.white,
-    child: SafeArea(
-      bottom: false,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Row(
-              children: [
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  onPressed: () => Navigator.pop(context),
-                  child: const Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.chevron_left,
-                        size: 20,
-                        color: AppColors.userBubble,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        '返回',
-                        style: TextStyle(
-                          fontSize: 15,
+    child: ContentFrame(
+      maxWidth: 860,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Row(
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    onPressed: () => Navigator.pop(context),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.chevron_left,
+                          size: 20,
                           color: AppColors.userBubble,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        widget.session.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.title,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.session.mode.displayTitle,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: CupertinoColors.systemGrey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  onPressed: () => showCupertinoSheet<bool>(
-                    context: context,
-                    scrollableBuilder: (_, _) =>
-                        ModeIntroductionPage(mode: widget.session.mode),
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.info_circle,
-                    size: 20,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                for (final mode in ChatMode.values)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: mode == widget.session.mode ? mode.color : null,
-                        border: Border.all(color: mode.color),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        mode == ChatMode.initial ? '初始' : mode.title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: mode == widget.session.mode
-                              ? CupertinoColors.white
-                              : mode.color,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Container(height: .5, color: CupertinoColors.separator),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: CupertinoActivityIndicator(),
-            ),
-          Expanded(
-            child: ColoredBox(
-              color: AppColors.chatBackground,
-              child: ListView(
-                controller: _scroll,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  if (_messages.isEmpty && !_loading && !_historyFailed)
-                    _bubble(
-                      ChatMessage(
-                        id: 'welcome',
-                        content:
-                            widget.content.welcomes[widget
-                                    .session
-                                    .mode
-                                    .apiValue]
-                                as String,
-                        isFromUser: false,
-                      ),
-                    ),
-                  ..._messages.map(_bubble),
-                  if (_error != null)
-                    ErrorNotice(_error!, onRetry: _sending ? null : _load),
-                  if (_ended)
-                    Surface(
-                      child: Column(
-                        children: [
-                          const Text('初談已結束'),
-                          if (_recommended != null)
-                            CupertinoButton(
-                              onPressed: _sending ? null : _handoff,
-                              child: Text('開始${_recommended!.title}對話'),
-                            ),
-                          CupertinoButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('回到聊天頁面'),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            alignment: Alignment.bottomCenter,
-            child: _quickReplies
-                ? Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    color: AppColors.chatBackground.withValues(alpha: .5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            '快速回覆',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: widget.session.mode.color,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              for (final reply
-                                  in widget.session.mode.quickReplies)
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: CupertinoButton(
-                                    padding: EdgeInsets.zero,
-                                    minimumSize: Size.zero,
-                                    onPressed: () {
-                                      _text.text = reply;
-                                      setState(() => _quickReplies = false);
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: CupertinoColors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: widget.session.mode.color
-                                              .withValues(alpha: .3),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        reply,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: widget.session.mode.color,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
+                        SizedBox(width: 6),
+                        Text(
+                          '返回',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColors.userBubble,
                           ),
                         ),
                       ],
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-          if (_sending)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-              color: AppColors.chatBackground,
-              child: Row(
-                children: [
-                  CupertinoActivityIndicator(color: widget.session.mode.color),
-                  const SizedBox(width: 8),
-                  Text(
-                    '訊息傳送中，請稍候...',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 1.2,
-                      color: widget.session.mode.color,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.session.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.title,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.session.mode.displayTitle,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: CupertinoColors.systemGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    onPressed: () => showCupertinoSheet<bool>(
+                      context: context,
+                      scrollableBuilder: (_, _) =>
+                          ModeIntroductionPage(mode: widget.session.mode),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.info_circle,
+                      size: 20,
+                      color: CupertinoColors.systemGrey,
                     ),
                   ),
                 ],
               ),
             ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              color: AppColors.chatBackground,
-              border: Border(
-                top: BorderSide(color: Color(0x4D8E8E93), width: .5),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Row(
+                children: [
+                  for (final mode in ChatMode.values)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: mode == widget.session.mode
+                              ? mode.color
+                              : null,
+                          border: Border.all(color: mode.color),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          mode == ChatMode.initial ? '初始' : mode.title,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: mode == widget.session.mode
+                                ? CupertinoColors.white
+                                : mode.color,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  onPressed: _sending || _ended
-                      ? null
-                      : () => setState(() => _quickReplies = !_quickReplies),
-                  child: Icon(
-                    _quickReplies
-                        ? CupertinoIcons.xmark_circle
-                        : CupertinoIcons.plus_circle,
-                    size: 22,
-                    color: _quickReplies
-                        ? CupertinoColors.systemRed
-                        : CupertinoColors.systemGrey,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ValueListenableBuilder(
-                    valueListenable: _text,
-                    builder: (context, value, _) => CupertinoTextField(
-                      controller: _text,
-                      placeholder: widget.session.mode.placeholder,
-                      placeholderStyle: const TextStyle(
-                        fontSize: 17,
-                        height: 1.2,
-                        color: CupertinoColors.placeholderText,
+            Container(height: .5, color: CupertinoColors.separator),
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: CupertinoActivityIndicator(),
+              ),
+            Expanded(
+              child: ColoredBox(
+                color: AppColors.chatBackground,
+                child: ListView(
+                  controller: _scroll,
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    if (_messages.isEmpty && !_loading && !_historyFailed)
+                      _bubble(
+                        ChatMessage(
+                          id: 'welcome',
+                          content:
+                              widget.content.welcomes[widget
+                                      .session
+                                      .mode
+                                      .apiValue]
+                                  as String,
+                          isFromUser: false,
+                        ),
                       ),
-                      suffix: value.text.characters.length > 100
-                          ? Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: Text(
-                                '${value.text.characters.length}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  height: 1.2,
-                                  color: CupertinoColors.systemGrey,
-                                ),
+                    ..._messages.map(_bubble),
+                    if (_error != null)
+                      ErrorNotice(_error!, onRetry: _sending ? null : _load),
+                    if (_ended)
+                      Surface(
+                        child: Column(
+                          children: [
+                            const Text('初談已結束'),
+                            if (_recommended != null)
+                              CupertinoButton(
+                                onPressed: _sending ? null : _handoff,
+                                child: Text('開始${_recommended!.title}對話'),
                               ),
-                            )
-                          : null,
-                      minLines: 1,
-                      maxLines: 4,
-                      enabled:
-                          !_sending &&
-                          !_loading &&
-                          !_historyFailed &&
-                          !_sendUncertain &&
-                          !_ended,
-                      style: const TextStyle(
-                        fontSize: 17,
+                            CupertinoButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('回到聊天頁面'),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              alignment: Alignment.bottomCenter,
+              child: _quickReplies
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      color: AppColors.chatBackground.withValues(alpha: .5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              '快速回覆',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: widget.session.mode.color,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                for (final reply
+                                    in widget.session.mode.quickReplies)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: CupertinoButton(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      onPressed: () {
+                                        _text.text = reply;
+                                        setState(() => _quickReplies = false);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: CupertinoColors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color: widget.session.mode.color
+                                                .withValues(alpha: .3),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          reply,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: widget.session.mode.color,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            if (_sending)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                color: AppColors.chatBackground,
+                child: Row(
+                  children: [
+                    CupertinoActivityIndicator(
+                      color: widget.session.mode.color,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '訊息傳送中，請稍候...',
+                      style: TextStyle(
+                        fontSize: 12,
                         height: 1.2,
-                        color: CupertinoColors.label,
+                        color: widget.session.mode.color,
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: CupertinoColors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: value.text.trim().isEmpty
-                              ? CupertinoColors.systemGrey.withValues(alpha: .3)
-                              : widget.session.mode.color.withValues(alpha: .5),
-                          width: value.text.trim().isEmpty ? 1 : 2,
+                    ),
+                  ],
+                ),
+              ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: AppColors.chatBackground,
+                border: Border(
+                  top: BorderSide(color: Color(0x4D8E8E93), width: .5),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    onPressed: _sending || _ended
+                        ? null
+                        : () => setState(() => _quickReplies = !_quickReplies),
+                    child: Icon(
+                      _quickReplies
+                          ? CupertinoIcons.xmark_circle
+                          : CupertinoIcons.plus_circle,
+                      size: 22,
+                      color: _quickReplies
+                          ? CupertinoColors.systemRed
+                          : CupertinoColors.systemGrey,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ValueListenableBuilder(
+                      valueListenable: _text,
+                      builder: (context, value, _) => CupertinoTextField(
+                        controller: _text,
+                        placeholder: widget.session.mode.placeholder,
+                        placeholderStyle: const TextStyle(
+                          fontSize: 17,
+                          height: 1.2,
+                          color: CupertinoColors.placeholderText,
+                        ),
+                        suffix: value.text.characters.length > 100
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 12),
+                                child: Text(
+                                  '${value.text.characters.length}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    height: 1.2,
+                                    color: CupertinoColors.systemGrey,
+                                  ),
+                                ),
+                              )
+                            : null,
+                        minLines: 1,
+                        maxLines: 4,
+                        enabled:
+                            !_sending &&
+                            !_loading &&
+                            !_historyFailed &&
+                            !_sendUncertain &&
+                            !_ended,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          height: 1.2,
+                          color: CupertinoColors.label,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: CupertinoColors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: value.text.trim().isEmpty
+                                ? CupertinoColors.systemGrey.withValues(
+                                    alpha: .3,
+                                  )
+                                : widget.session.mode.color.withValues(
+                                    alpha: .5,
+                                  ),
+                            width: value.text.trim().isEmpty ? 1 : 2,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                ValueListenableBuilder(
-                  valueListenable: _text,
-                  builder: (context, value, _) => CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    onPressed:
-                        _sending ||
-                            _loading ||
-                            _historyFailed ||
-                            _sendUncertain ||
-                            _ended ||
-                            value.text.trim().isEmpty
-                        ? null
-                        : _send,
-                    child: _sending
-                        ? const CupertinoActivityIndicator()
-                        : Icon(
-                            value.text.trim().isEmpty
-                                ? CupertinoIcons.arrow_up_circle
-                                : CupertinoIcons.arrow_up_circle_fill,
-                            size: 24,
-                            color: value.text.trim().isEmpty
-                                ? CupertinoColors.systemGrey
-                                : widget.session.mode.color,
-                            semanticLabel: '傳送訊息',
-                          ),
+                  const SizedBox(width: 12),
+                  ValueListenableBuilder(
+                    valueListenable: _text,
+                    builder: (context, value, _) => CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      onPressed:
+                          _sending ||
+                              _loading ||
+                              _historyFailed ||
+                              _sendUncertain ||
+                              _ended ||
+                              value.text.trim().isEmpty
+                          ? null
+                          : _send,
+                      child: _sending
+                          ? const CupertinoActivityIndicator()
+                          : Icon(
+                              value.text.trim().isEmpty
+                                  ? CupertinoIcons.arrow_up_circle
+                                  : CupertinoIcons.arrow_up_circle_fill,
+                              size: 24,
+                              color: value.text.trim().isEmpty
+                                  ? CupertinoColors.systemGrey
+                                  : widget.session.mode.color,
+                              semanticLabel: '傳送訊息',
+                            ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );

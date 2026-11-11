@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
+import '../../shared/responsive_layout.dart';
 import '../../core/platform/local_media_store.dart';
 import '../../core/platform/media_picker.dart';
 import '../../shared/system_symbol.dart';
@@ -101,10 +102,8 @@ class _ProfilePageState extends State<ProfilePage> {
       return CupertinoPageScaffold(
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: SizedBox(height: 20)),
-            const CupertinoSliverNavigationBar(
-              largeTitle: Text('個人檔案'),
-              backgroundColor: AppColors.lightYellow,
+            const SliverToBoxAdapter(
+              child: SafeArea(bottom: false, child: PageHeading('個人檔案')),
             ),
             CupertinoSliverRefreshControl(
               onRefresh: widget.controller.loadProfile,
@@ -226,8 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   MindCard(
                     child: CupertinoButton(
                       padding: EdgeInsets.zero,
@@ -250,18 +248,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 24),
                   const Text('時光寶盒', style: headingStyle),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 188,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      child: _TreasureCard(
-                        onTap: () => showTreasure(context, widget.media),
-                      ),
-                    ),
+                  _TreasureCard(
+                    onTap: () => showTreasure(context, widget.media),
                   ),
                   const SizedBox(height: 24),
                   MindCard(
@@ -496,93 +484,61 @@ class _TreasureCard extends StatelessWidget {
   const _TreasureCard({required this.onTap});
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Container(
-    width: 170,
-    height: 160,
-    clipBehavior: Clip.antiAlias,
-    decoration: BoxDecoration(
-      color: CupertinoColors.white,
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                CupertinoColors.systemOrange.withValues(alpha: .95),
-                CupertinoColors.systemOrange.withValues(alpha: .75),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                '支撐我的片刻',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                  color: CupertinoColors.white,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Container(
-                height: 4,
-                decoration: BoxDecoration(
-                  color: CupertinoColors.white.withValues(alpha: .18),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ],
-          ),
+  Widget build(BuildContext context) => CupertinoButton(
+    padding: EdgeInsets.zero,
+    onPressed: onTap,
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFE7B2), Color(0xFFFFD49A)],
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(14),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            CupertinoIcons.heart_fill,
+            size: 36,
+            color: AppColors.orange,
+          ),
+          const SizedBox(width: 20),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '寫一句話，留給需要被支持的自己。',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 13, color: CupertinoColors.label),
+                Text(
+                  '支撐我的片刻',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.title,
+                  ),
                 ),
-                const Spacer(),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  onPressed: onTap,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: CupertinoColors.systemOrange.withValues(
-                        alpha: .12,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '查看我的理由 ›',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: CupertinoColors.systemOrange,
-                        ),
-                      ),
-                    ),
+                SizedBox(height: 6),
+                Text(
+                  '寫一句話，留給需要被支持的自己。',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                    color: AppColors.mediumBrown,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  '查看我的理由 ›',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.darkBrown,
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
@@ -726,175 +682,177 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             border: null,
           ),
         ),
-        child: SafeArea(
-          bottom: false,
-          child: ListView(
-            children: [
-              Container(
-                color: AppColors.lightYellow,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 64),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _card(
-                      Column(
-                        children: [
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            onPressed: widget.onAvatarTap == null
-                                ? null
-                                : _changeAvatar,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                FutureBuilder(
-                                  future: _avatar,
-                                  builder: (context, snapshot) => Container(
-                                    width: 110,
-                                    height: 110,
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: CupertinoColors.systemOrange
-                                          .withValues(alpha: .85),
-                                      border: Border.all(
-                                        color: CupertinoColors.white.withValues(
-                                          alpha: .9,
-                                        ),
-                                        width: 3,
-                                      ),
-                                    ),
-                                    child: snapshot.data == null
-                                        ? Center(
-                                            child: Text(
-                                              _initials(user),
-                                              style: const TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold,
-                                                color: CupertinoColors.white,
-                                              ),
-                                            ),
-                                          )
-                                        : Image.memory(
-                                            snapshot.data!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.orange,
-                                      border: Border.all(
-                                        color: CupertinoColors.white,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: const SystemSymbol(
-                                      'camera.fill',
-                                      size: 15,
-                                      weight: 'bold',
-                                      color: CupertinoColors.white,
-                                      fallback: CupertinoIcons.camera_fill,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            fullName(user),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              height: 1.2,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.title,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            '更換頭貼',
-                            style: TextStyle(
-                              fontSize: 13,
-                              height: 1.2,
-                              color: CupertinoColors.secondaryLabel,
-                            ),
-                          ),
-                        ],
-                      ),
-                      header: true,
-                    ),
-                    const SizedBox(height: 20),
-                    _card(
-                      Column(
-                        children: [
-                          _row(
-                            'envelope.fill',
-                            'Email',
-                            user['email']?.toString() ?? '-',
-                          ),
-                          const SizedBox(height: 12),
-                          _row('person.text.rectangle', '姓名', fullName(user)),
-                          const SizedBox(height: 12),
-                          _row('calendar', '出生年月', _birthMonth(user)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      onPressed: () => Navigator.of(context).push(
-                        CupertinoPageRoute<void>(
-                          builder: (_) =>
-                              _EditInfoPage(controller: widget.controller),
-                        ),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.orange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Row(
+        child: ContentFrame(
+          maxWidth: 760,
+          child: SafeArea(
+            bottom: false,
+            child: ListView(
+              children: [
+                Container(
+                  color: AppColors.lightYellow,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 64),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _card(
+                        Column(
                           children: [
-                            SystemSymbol(
-                              'pencil',
-                              size: 17,
-                              color: CupertinoColors.white,
-                              fallback: CupertinoIcons.pencil,
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '編輯個人資訊',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  height: 1.2,
-                                  fontWeight: FontWeight.w600,
-                                  color: CupertinoColors.white,
-                                ),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              onPressed: widget.onAvatarTap == null
+                                  ? null
+                                  : _changeAvatar,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  FutureBuilder(
+                                    future: _avatar,
+                                    builder: (context, snapshot) => Container(
+                                      width: 110,
+                                      height: 110,
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: CupertinoColors.systemOrange
+                                            .withValues(alpha: .85),
+                                        border: Border.all(
+                                          color: CupertinoColors.white
+                                              .withValues(alpha: .9),
+                                          width: 3,
+                                        ),
+                                      ),
+                                      child: snapshot.data == null
+                                          ? Center(
+                                              child: Text(
+                                                _initials(user),
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: CupertinoColors.white,
+                                                ),
+                                              ),
+                                            )
+                                          : Image.memory(
+                                              snapshot.data!,
+                                              fit: BoxFit.cover,
+                                            ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.orange,
+                                        border: Border.all(
+                                          color: CupertinoColors.white,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: const SystemSymbol(
+                                        'camera.fill',
+                                        size: 15,
+                                        weight: 'bold',
+                                        color: CupertinoColors.white,
+                                        fallback: CupertinoIcons.camera_fill,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Icon(
-                              CupertinoIcons.chevron_right,
-                              size: 13,
-                              color: CupertinoColors.white,
+                            const SizedBox(height: 12),
+                            Text(
+                              fullName(user),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                height: 1.2,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.title,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              '更換頭貼',
+                              style: TextStyle(
+                                fontSize: 13,
+                                height: 1.2,
+                                color: CupertinoColors.secondaryLabel,
+                              ),
                             ),
                           ],
                         ),
+                        header: true,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 20),
+                      _card(
+                        Column(
+                          children: [
+                            _row(
+                              'envelope.fill',
+                              'Email',
+                              user['email']?.toString() ?? '-',
+                            ),
+                            const SizedBox(height: 12),
+                            _row('person.text.rectangle', '姓名', fullName(user)),
+                            const SizedBox(height: 12),
+                            _row('calendar', '出生年月', _birthMonth(user)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        onPressed: () => Navigator.of(context).push(
+                          CupertinoPageRoute<void>(
+                            builder: (_) =>
+                                _EditInfoPage(controller: widget.controller),
+                          ),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.orange,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Row(
+                            children: [
+                              SystemSymbol(
+                                'pencil',
+                                size: 17,
+                                color: CupertinoColors.white,
+                                fallback: CupertinoIcons.pencil,
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '編輯個人資訊',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    height: 1.2,
+                                    fontWeight: FontWeight.w600,
+                                    color: CupertinoColors.white,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                CupertinoIcons.chevron_right,
+                                size: 13,
+                                color: CupertinoColors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -1001,120 +959,126 @@ class _EditInfoPageState extends State<_EditInfoPage> {
         border: null,
       ),
     ),
-    child: SafeArea(
-      bottom: false,
-      child: ListView(
-        children: [
-          CupertinoFormSection.insetGrouped(
-            decoration: BoxDecoration(
-              color: CupertinoColors.secondarySystemGroupedBackground,
-              borderRadius: BorderRadius.circular(26),
-            ),
-            header: const Padding(
-              padding: EdgeInsets.only(left: 20, bottom: 4),
-              child: Text('基本資料', style: TextStyle(fontSize: 13, height: 1.2)),
-            ),
-            children: [
-              CupertinoTextFormFieldRow(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                controller: _email,
-                placeholder: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
-                enabled: !_busy,
-                style: const TextStyle(
-                  fontSize: 17,
-                  height: 1.2,
-                  color: CupertinoColors.label,
-                ),
-              ),
-              CupertinoTextFormFieldRow(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                controller: _name,
-                placeholder: '姓名',
-                enabled: !_busy,
-                style: const TextStyle(
-                  fontSize: 17,
-                  height: 1.2,
-                  color: CupertinoColors.label,
-                ),
-              ),
-              CupertinoFormRow(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                prefix: const Text(
-                  '出生年月',
-                  style: TextStyle(
-                    fontSize: 17,
-                    height: 1.2,
-                    color: CupertinoColors.label,
-                  ),
-                ),
-                child: Text(
-                  _birthDisplay,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    height: 1.2,
-                    color: CupertinoColors.secondaryLabel,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (_error != null)
+    child: ContentFrame(
+      maxWidth: 760,
+      child: SafeArea(
+        bottom: false,
+        child: ListView(
+          children: [
             CupertinoFormSection.insetGrouped(
               decoration: BoxDecoration(
                 color: CupertinoColors.secondarySystemGroupedBackground,
                 borderRadius: BorderRadius.circular(26),
               ),
+              header: const Padding(
+                padding: EdgeInsets.only(left: 20, bottom: 4),
+                child: Text(
+                  '基本資料',
+                  style: TextStyle(fontSize: 13, height: 1.2),
+                ),
+              ),
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
+                CupertinoTextFormFieldRow(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  controller: _email,
+                  placeholder: 'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  enabled: !_busy,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    height: 1.2,
+                    color: CupertinoColors.label,
+                  ),
+                ),
+                CupertinoTextFormFieldRow(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  controller: _name,
+                  placeholder: '姓名',
+                  enabled: !_busy,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    height: 1.2,
+                    color: CupertinoColors.label,
+                  ),
+                ),
+                CupertinoFormRow(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  prefix: const Text(
+                    '出生年月',
+                    style: TextStyle(
+                      fontSize: 17,
+                      height: 1.2,
+                      color: CupertinoColors.label,
+                    ),
+                  ),
                   child: Text(
-                    _error!,
+                    _birthDisplay,
                     style: const TextStyle(
-                      fontSize: 13,
-                      color: CupertinoColors.systemRed,
+                      fontSize: 17,
+                      height: 1.2,
+                      color: CupertinoColors.secondaryLabel,
                     ),
                   ),
                 ),
               ],
             ),
-          CupertinoFormSection.insetGrouped(
-            margin: const EdgeInsets.fromLTRB(20, 26, 20, 10),
-            decoration: BoxDecoration(
-              color: CupertinoColors.secondarySystemGroupedBackground,
-              borderRadius: BorderRadius.circular(26),
-            ),
-            children: [
-              CupertinoButton(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                onPressed: _busy ? null : _save,
-                child: Center(
-                  child: _busy
-                      ? const CupertinoActivityIndicator()
-                      : const Text(
-                          '保存變更',
-                          style: TextStyle(
-                            fontSize: 17,
-                            height: 1.2,
-                            fontWeight: FontWeight.w600,
-                            color: CupertinoColors.systemOrange,
-                          ),
-                        ),
+            if (_error != null)
+              CupertinoFormSection.insetGrouped(
+                decoration: BoxDecoration(
+                  color: CupertinoColors.secondarySystemGroupedBackground,
+                  borderRadius: BorderRadius.circular(26),
                 ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: CupertinoColors.systemRed,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
+            CupertinoFormSection.insetGrouped(
+              margin: const EdgeInsets.fromLTRB(20, 26, 20, 10),
+              decoration: BoxDecoration(
+                color: CupertinoColors.secondarySystemGroupedBackground,
+                borderRadius: BorderRadius.circular(26),
+              ),
+              children: [
+                CupertinoButton(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  onPressed: _busy ? null : _save,
+                  child: Center(
+                    child: _busy
+                        ? const CupertinoActivityIndicator()
+                        : const Text(
+                            '保存變更',
+                            style: TextStyle(
+                              fontSize: 17,
+                              height: 1.2,
+                              fontWeight: FontWeight.w600,
+                              color: CupertinoColors.systemOrange,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     ),
   );
