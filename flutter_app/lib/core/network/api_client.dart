@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import 'tls_error_stub.dart' if (dart.library.io) 'tls_error_io.dart';
+
 class ApiException implements Exception {
   const ApiException(this.message, {this.status});
   final String message;
@@ -68,6 +70,11 @@ class ApiClient {
       throw const ApiException('連線逾時，請稍後再試');
     } on http.ClientException {
       throw const ApiException('無法連線至伺服器，請檢查網路與伺服器憑證');
+    } catch (error) {
+      if (isHandshakeException(error)) {
+        throw const ApiException('無法建立安全連線，伺服器憑證可能已過期或無效，請稍後再試');
+      }
+      rethrow;
     }
   }
 
