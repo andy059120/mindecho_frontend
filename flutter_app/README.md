@@ -1,6 +1,6 @@
 # PsychEcho Flutter
 
-同一個 repository 中的 Flutter iOS、Android 與 Web 前端。Swift 專案保留於上層 `mindecho/`，供功能與畫面對照。
+同一個 repository 中的 Flutter iOS、Android 與 Web 前端。舊版 Swift 專案保留於 [`../legacy_ios/`](../legacy_ios/README.md)，供功能與畫面對照。
 
 ## 固定環境
 
